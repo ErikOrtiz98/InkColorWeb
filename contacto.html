@@ -61,26 +61,30 @@
   </div>
 
   <form id="contactFormPage" action="https://formspree.io/f/tu-codigo-aqui" method="POST">
-    <div class="form-group">
-        <input type="text" name="nombre" id="fullName" placeholder="Nombre completo *" required>
-    </div>
-    <div class="form-group">
-        <input type="email" name="email" id="emailPage" placeholder="Correo electrónico *" required>
-    </div>
-    <div class="form-group">
-        <input type="tel" name="telefono" id="phone" placeholder="Teléfono">
-    </div>
-    <div class="form-group">
-        <input type="text" name="producto" id="productInterest" placeholder="Selecciona un producto de interés">
-    </div>
-    <div class="form-group">
-        <textarea rows="5" name="mensaje" id="messagePage" placeholder="Cuéntanos sobre tu proyecto..."></textarea>
-    </div>
-    <!-- Campo oculto para redirección después del envío -->
-    <input type="hidden" name="_next" value="https://tusitio.com/gracias.html">
-    <button type="submit" class="btn-send">Enviar mensaje</button>
-    <div id="formFeedbackPage" class="alert-msg"></div>
-</form>
+        <div class="form-group">
+            <input type="text" name="nombre" id="fullName" placeholder="Nombre completo *" required>
+        </div>
+        <div class="form-group">
+            <input type="email" name="email" id="emailPage" placeholder="Correo electrónico *" required>
+        </div>
+        <div class="form-group">
+            <input type="tel" name="telefono" id="phone" placeholder="Teléfono">
+        </div>
+        
+        <!-- Campo de producto - ahora es de solo lectura (se llena automáticamente) -->
+        <div class="form-group">
+            <input type="text" name="producto" id="productInterest" 
+                placeholder="Producto de interés" >
+        </div>
+        
+        <div class="form-group">
+            <textarea rows="5" name="mensaje" id="messagePage" placeholder="Cuéntanos sobre tu proyecto..."></textarea>
+        </div>
+        
+        <input type="hidden" name="_next" value="https://tusitio.com/gracias.html">
+        <button type="submit" class="btn-send">Enviar mensaje</button>
+        <div id="formFeedbackPage" class="alert-msg"></div>
+    </form>
 
 
 <footer>
@@ -89,24 +93,22 @@
 
 <script src="script.js"></script>
 <script>
-  // Detectar producto desde el catálogo (si viene por URL)
-  const urlParams = new URLSearchParams(window.location.search);
-  const producto = urlParams.get('producto');
-  if (producto) {
-    const select = document.getElementById('productInterest');
-    if (select) {
-      for (let i = 0; i < select.options.length; i++) {
-        if (select.options[i].value === producto || select.options[i].text === producto) {
-          select.selectedIndex = i;
-          break;
-        }
-      }
+// Detectar producto desde el catálogo (por URL)
+const urlParams = new URLSearchParams(window.location.search);
+const producto = urlParams.get('producto');
+
+if (producto) {
+    const productField = document.getElementById('productInterest');
+    if (productField) {
+        productField.value = producto;
     }
+    
+    // Opcional: también puedes llenar el mensaje
     const msgField = document.getElementById('messagePage');
     if (msgField && !msgField.value) {
-      msgField.value = `Hola, me interesa cotizar: ${producto}`;
+        msgField.value = `Hola, me interesa cotizar: ${producto}`;
     }
-  }
+}
 </script>
 </body>
 </html>

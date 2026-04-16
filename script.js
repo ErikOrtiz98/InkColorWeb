@@ -81,26 +81,54 @@ window.addEventListener('load', () => {
     }, 300);
 });
 
-// Filtros del catálogo
+// ===== FILTROS DEL CATÁLOGO (CORREGIDO) =====
 if (document.querySelector('.catalog-filters')) {
     const filterBtns = document.querySelectorAll('.filter-btn');
     const catalogItems = document.querySelectorAll('.catalog-item-full');
+    const catalogGrid = document.querySelector('.full-catalog-grid');
+
+    function filterCatalog(filterValue) {
+        let visibleCount = 0;
+        
+        catalogItems.forEach(item => {
+            const category = item.getAttribute('data-category');
+            
+            if (filterValue === 'all' || category === filterValue) {
+                item.style.display = 'flex';
+                item.style.opacity = '1';
+                item.style.order = visibleCount; // Mantiene el orden
+                visibleCount++;
+            } else {
+                item.style.display = 'none';
+                item.style.opacity = '0';
+            }
+        });
+        
+        // Si no hay elementos visibles, muestra un mensaje
+        if (visibleCount === 0) {
+            let noResultsMsg = document.querySelector('.no-results');
+            if (!noResultsMsg) {
+                noResultsMsg = document.createElement('div');
+                noResultsMsg.className = 'no-results';
+                noResultsMsg.innerHTML = '<p style="text-align: center; grid-column: 1/-1; padding: 40px;">No hay productos en esta categoría.</p>';
+                catalogGrid.appendChild(noResultsMsg);
+            }
+        } else {
+            const noResultsMsg = document.querySelector('.no-results');
+            if (noResultsMsg) noResultsMsg.remove();
+        }
+    }
 
     filterBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            const filter = btn.getAttribute('data-filter');
+            const filterValue = btn.getAttribute('data-filter');
+            
+            // Actualizar botón activo
             filterBtns.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-
-            catalogItems.forEach(item => {
-                if (filter === 'all' || item.getAttribute('data-category') === filter) {
-                    item.style.display = 'flex';
-                    setTimeout(() => item.style.opacity = '1', 10);
-                } else {
-                    item.style.opacity = '0';
-                    setTimeout(() => item.style.display = 'none', 200);
-                }
-            });
+            
+            // Filtrar
+            filterCatalog(filterValue);
         });
     });
 }
@@ -141,5 +169,139 @@ if (contactForm) {
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
         setTimeout(() => feedback.innerHTML = '', 5000);
+    });
+}
+
+// ===== CATÁLOGO DE PRODUCTOS (DINÁMICO) =====
+const productos = [
+    {
+        id: 1,
+        nombre: "Pizarrón Magnético Corporativo",
+        categoria: "pizarrones",
+        descripcion: "Ideal para oficinas y salas de juntas. Personalizable con tu logo.",
+        caracteristicas: ["✔️ Tamaños a medida", "✔️ Blanco o verde", "✔️ Marco de aluminio"],
+        imagen: "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=400&q=80",
+        precio: "Cotizar"
+    },
+    {
+        id: 2,
+        nombre: "Pizarrón Académico",
+        categoria: "pizarrones",
+        descripcion: "Perfecto para escuelas y centros de capacitación. Superficie de alta durabilidad.",
+        caracteristicas: ["✔️ Incluye bandeja", "✔️ Fácil limpieza", "✔️ Instalación sencilla"],
+        imagen: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=400&q=80",
+        precio: "Cotizar"
+    },
+    {
+        id: 3,
+        nombre: "Señales de Seguridad NOM",
+        categoria: "senaletica",
+        descripcion: "Señalamientos normados de prevención, obligación y emergencia.",
+        caracteristicas: ["✔️ Material reflectivo", "✔️ Tamaños personalizados", "✔️ Normas NOM"],
+        imagen: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80",
+        precio: "Cotizar"
+    },
+    {
+        id: 4,
+        nombre: "Señalética Direccional",
+        categoria: "senaletica",
+        descripcion: "Letreros y placas para orientación en centros comerciales y hospitales.",
+        caracteristicas: ["✔️ Diseño personalizado", "✔️ Bilingüe disponible", "✔️ Alta visibilidad"],
+        imagen: "https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?w=400&q=80",
+        precio: "Cotizar"
+    },
+    {
+        id: 5,
+        nombre: "Etiquetas Adhesivas Full Color",
+        categoria: "etiquetas",
+        descripcion: "Etiquetas personalizadas para productos y empaques. Alta calidad de impresión.",
+        caracteristicas: ["✔️ Resistentes al agua", "✔️ Troquelado personalizado", "✔️ Acabado mate/brillante"],
+        imagen: "https://images.unsplash.com/photo-1607082349566-187342175e2f?w=400&q=80",
+        precio: "Cotizar"
+    },
+    {
+        id: 6,
+        nombre: "Etiquetas con Código QR",
+        categoria: "etiquetas",
+        descripcion: "Etiquetas con código QR o barras para inventario y logística.",
+        caracteristicas: ["✔️ QR personalizado", "✔️ Numeración variable", "✔️ Alta durabilidad"],
+        imagen: "https://images.unsplash.com/photo-1585247226801-bc613c441316?w=400&q=80",
+        precio: "Cotizar"
+    },
+    {
+        id: 7,
+        nombre: "Stand Promocional para Ferias",
+        categoria: "stands",
+        descripcion: "Estructuras para exposiciones y eventos. Fáciles de armar y transportar.",
+        caracteristicas: ["✔️ Armado rápido", "✔️ Incluye maleta", "✔️ Impresión full color"],
+        imagen: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&q=80",
+        precio: "Cotizar"
+    }
+];
+
+// ===== FUNCIÓN PARA RENDERIZAR PRODUCTOS =====
+function renderizarCatalogo(productosFiltrados = null) {
+    const grid = document.getElementById('catalogGrid');
+    if (!grid) return;
+    
+    const productosAMostrar = productosFiltrados || productos;
+    
+    if (productosAMostrar.length === 0) {
+        grid.innerHTML = '<div class="no-results" style="grid-column: 1/-1; text-align: center; padding: 60px 20px;"><h3>No hay productos en esta categoría</h3><p>Pronto agregaremos más opciones para ti.</p></div>';
+        return;
+    }
+    
+    grid.innerHTML = productosAMostrar.map(producto => `
+        <div class="catalog-item-full" data-category="${producto.categoria}" data-id="${producto.id}">
+            <div class="card-header">
+                <h3>${producto.nombre.split(' ')[0]} ${producto.nombre.split(' ')[1] || ''}</h3>
+            </div>
+            <img class="card-img" src="${producto.imagen}" alt="${producto.nombre}" onerror="this.src='https://via.placeholder.com/400x180/333/fff?text=${encodeURIComponent(producto.nombre)}'">
+            <div class="card-body">
+                <h4>${producto.nombre}</h4>
+                <p>${producto.descripcion}</p>
+                <div class="catalog-features">
+                    ${producto.caracteristicas.map(car => `<span>${car}</span>`).join('')}
+                </div>
+                <a href="contacto.html?producto=${encodeURIComponent(producto.nombre)}" class="btn-ver">Solicitar cotización</a>
+            </div>
+        </div>
+    `).join('');
+    
+    // Re-aplicar animación de entrada
+    document.querySelectorAll('.catalog-item-full').forEach((item, index) => {
+        item.style.animation = `fadeInScale 0.3s ease ${index * 0.05}s forwards`;
+        item.style.opacity = '0';
+    });
+}
+
+// ===== FUNCIÓN PARA FILTRAR =====
+function filtrarPorCategoria(categoria) {
+    if (categoria === 'all') {
+        renderizarCatalogo(productos);
+    } else {
+        const filtrados = productos.filter(p => p.categoria === categoria);
+        renderizarCatalogo(filtrados);
+    }
+}
+
+// ===== INICIALIZAR FILTROS =====
+if (document.querySelector('.catalog-filters')) {
+    // Renderizar productos al cargar
+    renderizarCatalogo();
+    
+    // Configurar botones de filtro
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const filterValue = btn.getAttribute('data-filter');
+            
+            // Actualizar botón activo
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            // Filtrar
+            filtrarPorCategoria(filterValue);
+        });
     });
 }
