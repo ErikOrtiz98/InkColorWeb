@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InkColor</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" type="image/png" href="assets/mancha-tinta-6.png">
+</head>
+<body class="page-catalogo">
+
+<nav>
+    <a href="index.html" class="logo-link">
+        <div class="logo">
+             <img src="assets/file_00000000a7e0722fa5edb0c7636377c4.png" alt="Logotipo Grupo Impresión">
+        </div>
+    </a>
+  <div class="nav-links">
+    <a href="index.html">Inicio</a>
+    <a href="catalogo.html" class="active">Catálogo</a>
+    <a href="contacto.html">Contacto</a>
+    <span class="hamburger">☰</span>
+  </div>
+</nav>
+
+<section class="page-header" style="background: linear-gradient(135deg, #0a0a0a, #1a1a1a); padding: 160px 0 60px; text-align: center; color: white;">
+  <h1 style="font-size: 3rem;">Nuestro Catálogo</h1>
+  <p style="font-size: 1.2rem;">Descubre toda nuestra gama de productos en impresión digital</p>
+</section>
+
+<div class="catalog-filters">
+  <button class="filter-btn active" data-filter="all">Todos</button>
+  <button class="filter-btn" data-filter="pizarrones">Pizarrones</button>
+  <button class="filter-btn" data-filter="senaletica">Señalética</button>
+  <button class="filter-btn" data-filter="etiquetas">Etiquetas</button>
+  <button class="filter-btn" data-filter="stands">Demo Stands</button>
+</div>
+
+<div class="full-catalog-grid">
+  <!-- Pizarrones -->
+  <div class="catalog-item-full" data-category="pizarrones" id="pizarrones">
+    <div class="card-header"><h3>Pizarrones Corporativos</h3></div>
+    <img class="card-img" src="https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=400&q=80" alt="Pizarrón">
+    <div class="card-body">
+      <h4>Pizarrón Magnético</h4>
+      <p>Ideal para oficinas y salas de juntas. Personalizable con tu logo.</p>
+      <div class="catalog-features"><span>✔️ Tamaños a medida</span><span>✔️ Blanco o verde</span></div>
+      <a href="contacto.html?producto=Pizarrón%20Corporativo" class="btn-ver">Solicitar cotización</a>
+    </div>
+  </div>
+  <div class="catalog-item-full" data-category="pizarrones">
+    <div class="card-header"><h3>Pizarrones Académicos</h3></div>
+    <img class="card-img" src="https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=400&q=80" alt="Pizarrón escolar">
+    <div class="card-body">
+      <h4>Pizarrón para Escuelas</h4>
+      <p>Resistente a rayones, fácil limpieza. Marco de aluminio.</p>
+      <div class="catalog-features"><span>✔️ Incluye bandeja</span><span>✔️ Instalación sencilla</span></div>
+      <a href="contacto.html?producto=Pizarrón%20Académico" class="btn-ver">Solicitar cotización</a>
+    </div>
+  </div>
+
+  <!-- Señalética -->
+  <div class="catalog-item-full" data-category="senaletica" id="senaletica">
+    <div class="card-header"><h3>Señalética de Seguridad</h3></div>
+    <img class="card-img" src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80" alt="Señalética">
+    <div class="card-body">
+      <h4>Señales NOM-026-STPS</h4>
+      <p>Señalamientos de obligación, prevención y emergencia.</p>
+      <div class="catalog-features"><span>✔️ Material reflectivo</span><span>✔️ Tamaños personalizados</span></div>
+      <a href="contacto.html?producto=Señalética%20de%20Seguridad" class="btn-ver">Solicitar cotización</a>
+    </div>
+  </div>
+  <div class="catalog-item-full" data-category="senaletica">
+    <div class="card-header"><h3>Señalética Direccional</h3></div>
+    <img class="card-img" src="https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?w=400&q=80" alt="Direccional">
+    <div class="card-body">
+      <h4>Rótulos y Flechas</h4>
+      <p>Ideal para centros comerciales, hospitales y oficinas.</p>
+      <div class="catalog-features"><span>✔️ Diseño personalizado</span><span>✔️ Bilingüe disponible</span></div>
+      <a href="contacto.html?producto=Señalética%20Direccional" class="btn-ver">Solicitar cotización</a>
+    </div>
+  </div>
+
+  <!-- Etiquetas -->
+  <div class="catalog-item-full" data-category="etiquetas" id="etiquetas">
+    <div class="card-header"><h3>Etiquetas Adhesivas</h3></div>
+    <img class="card-img" src="https://images.unsplash.com/photo-1607082349566-187342175e2f?w=400&q=80" alt="Etiquetas">
+    <div class="card-body">
+      <h4>Etiquetas Full Color</h4>
+      <p>Resistentes al agua, troquelado personalizado.</p>
+      <div class="catalog-features"><span>✔️ Acabado mate/brillante</span><span>✔️ Formas especiales</span></div>
+      <a href="contacto.html?producto=Etiquetas%20Adhesivas" class="btn-ver">Solicitar cotización</a>
+    </div>
+  </div>
+  <div class="catalog-item-full" data-category="etiquetas">
+    <div class="card-header"><h3>Etiquetas con Código</h3></div>
+    <img class="card-img" src="https://images.unsplash.com/photo-1585247226801-bc613c441316?w=400&q=80" alt="Código de barras">
+    <div class="card-body">
+      <h4>Códigos QR y Barras</h4>
+      <p>Numeración variable, ideales para inventarios.</p>
+      <div class="catalog-features"><span>✔️ QR personalizado</span><span>✔️ Secuenciales</span></div>
+      <a href="contacto.html?producto=Etiquetas%20con%20Código" class="btn-ver">Solicitar cotización</a>
+    </div>
+  </div>
+
+  <!-- Demo Stands -->
+  <div class="catalog-item-full" data-category="stands" id="stands">
+    <div class="card-header"><h3>Stand Promocional</h3></div>
+    <img class="card-img" src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&q=80" alt="Stand">
+    <div class="card-body">
+      <h4>Stand para Ferias</h4>
+      <p>Estructura ligera, fácil de armar y transportar.</p>
+      <div class="catalog-features"><span>✔️ Incluye maleta</span><span>✔️ Impresión full color</span></div>
+      <a href="contacto.html?producto=Stand%20Promocional" class="btn-ver">Solicitar cotización</a>
+    </div>
+  </div>
+  <div class="catalog-item-full" data-category="stands">
+    <div class="card-header"><h3>Stand Textil</h3></div>
+    <img class="card-img" src="https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=400&q=80" alt="Stand textil">
+    <div class="card-body">
+      <h4>Stand con Impresión Textil</h4>
+      <p>Moderno, ligero y con gran impacto visual.</p>
+      <div class="catalog-features"><span>✔️ Sin arrugas</span><span>✔️ Montaje rápido</span></div>
+      <a href="contacto.html?producto=Stand%20Textil" class="btn-ver">Solicitar cotización</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  © 2025 <span>Grupo InkColor</span> — Todos los derechos reservados.
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
