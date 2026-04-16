@@ -1,182 +1,112 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Contacto | Impresión Visual</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
-    <!-- Animaciones -->
-    <link rel="stylesheet" href="animations.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InkColor</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="icon" type="image/png" href="assets/mancha-tinta-6.png">
 </head>
-</head>
-<!-- Scripts de animación -->
-<script src="script-animations.js"></script>
-<body>
+<body class="page-contacto">
 
-<nav class="navbar">
-    <div class="container nav-flex">
-        <a href="index.html" class="logo-link">
-            <div class="logo">
-                 <img src="assets/file_00000000a7e0722fa5edb0c7636377c4.png" alt="Logotipo Grupo Impresión">
-            </div>
-        </a>
-        <div class="nav-links">
-            <a href="index.html">Inicio</a>
-            <a href="catalogo.html">Catálogo</a>
-            <a href="contacto.html" class="active">Contacto</a>
+<nav>
+    <a href="index.html" class="logo-link">
+        <div class="logo">
+             <img src="assets/file_00000000a7e0722fa5edb0c7636377c4.png" alt="Logotipo Grupo Impresión">
         </div>
-    </div>
+    </a>
+  <div class="nav-links">
+    <a href="index.html">Inicio</a>
+    <a href="catalogo.html">Catálogo</a>
+    <a href="contacto.html" class="active">Contacto</a>
+    <span class="hamburger">☰</span>
+  </div>
 </nav>
 
-<main>
-    <!-- Header de contacto -->
-    <section class="page-header">
-        <div class="container">
-            <h1>Contáctanos</h1>
-            <p>Estamos listos para ayudarte con tu proyecto de impresión</p>
+<section class="page-header" style="background: linear-gradient(135deg, #0a0a0a, #1a1a1a); padding: 160px 0 60px; text-align: center; color: white;">
+  <h1 style="font-size: 3rem;">Contáctanos</h1>
+  <p style="font-size: 1.2rem;">Estamos listos para ayudarte con tu proyecto de impresión</p>
+</section>
+
+<div class="contact-page-wrapper">
+  <div class="contact-info-card">
+    <div class="contact-method">
+        <div class="contact-icon"><i class="fab fa-whatsapp"></i></div>
+        <div>
+          <h4>WhatsApp</h4>
+          <a href="https://wa.me/525530526764" style="text-decoration: none; color: inherit;">
+            <p>55305-26764</p>
+          </a>
         </div>
-    </section>
-
-    <div class="container">
-        <div class="contact-page-grid">
-            <!-- Información de contacto -->
-            <div class="contact-info-card">
-                <div class="contact-method">
-                    <div class="contact-icon"><i class="fas fa-phone-alt"></i></div>
-                    <div>
-                        <h4>Teléfono</h4>
-                        <p>55900-26756</p>
-                        <p>55300-26756</p>
-                    </div>
-                </div>
-                
-                <div class="contact-method">
-                    <div class="contact-icon"><i class="fas fa-envelope"></i></div>
-                    <div>
-                        <h4>Email</h4>
-                        <p>ventas@grupoimpresion.com</p>
-                        <p>atencion@grupoimpresion.com</p>
-                    </div>
-                </div>
-                
-                <div class="contact-method">
-                    <div class="contact-icon"><i class="fas fa-clock"></i></div>
-                    <div>
-                        <h4>Horario de atención</h4>
-                        <p>Lunes a Viernes: 9:00 - 18:00</p>
-                        <p>Sábados: 10:00 - 14:00</p>
-                    </div>
-                </div>
-                
-                <div class="contact-method">
-                    <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
-                    <div>
-                        <h4>Ubicación</h4>
-                        <p>Av. Insurgentes Sur 1234,</p>
-                        <p>CDMX, México</p>
-                    </div>
-                </div>
-
-                <div class="social-links">
-                    <h4>Síguenos</h4>
-                    <div class="social-icons">
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-whatsapp"></i></a>
-                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Formulario de contacto -->
-            <div class="contact-form-card">
-                <h3>Envíanos un mensaje</h3>
-                <form id="contactFormPage">
-                    <div class="form-row">
-                        <div class="form-group half">
-                            <label>Nombre completo *</label>
-                            <input type="text" id="fullName" placeholder="Tu nombre" required>
-                        </div>
-                        <div class="form-group half">
-                            <label>Correo electrónico *</label>
-                            <input type="email" id="emailPage" placeholder="tu@email.com" required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group half">
-                            <label>Teléfono</label>
-                            <input type="tel" id="phone" placeholder="55 1234 5678">
-                        </div>
-                        <div class="form-group half">
-                            <label>Producto de interés</label>
-                            <select id="productInterest">
-                                <option value="">Selecciona un producto</option>
-                                <option value="Pizarrones">Pizarrones</option>
-                                <option value="Señalética">Señalética</option>
-                                <option value="Etiquetas">Etiquetas</option>
-                                <option value="Demo Stands">Demo Stands</option>
-                                <option value="Otro">Otro</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Mensaje *</label>
-                        <textarea rows="5" id="messagePage" placeholder="Cuéntanos sobre tu proyecto..."></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="newsletter"> Acepto recibir información sobre promociones y novedades
-                        </label>
-                    </div>
-                    <button type="submit" class="btn-send"><i class="fas fa-paper-plane"></i> Enviar mensaje</button>
-                    <div id="formFeedbackPage" class="alert-msg"></div>
-                </form>
-            </div>
+      </div>
+      <div class="contact-method">
+        <div class="contact-icon"><i class="fab fa-whatsapp"></i></div>
+        <div>
+          <h4>WhatsApp</h4>
+          <a href="https://wa.me/525565105384" style="text-decoration: none; color: inherit;">
+            <p>55651-05384</p>
+          </a>
         </div>
+      </div>
+    <div class="contact-method">
+      <div class="contact-icon">✉️</div>
+      <div><h4>Email</h4><p>ereidc@inkcolor.com</p></div>
     </div>
-
-    <!-- Mapa -->
-    <div class="map-section">
-        <div class="container">
-            <h3>¿Dónde encontrarnos?</h3>
-            <div class="map-container">
-                <iframe src="https://www.google.com/maps/place/C.+Heli%C3%B3polis+68,+Col+del+Recreo,+Azcapotzalco,+02070+Ciudad+de+M%C3%A9xico,+CDMX/@19.4695896,-99.1845944,16z/data=!4m6!3m5!1s0x85d1f88386c4770f:0x2163e7f82856688e!8m2!3d19.4695896!4d-99.1845944!16s%2Fg%2F11c0_gnrk1?utm_campaign=ml-ardl&g_ep=Eg1tbF8yMDI2MDMyM18wIJvbDyoASAJQAQ%3D%3D" 
-                        width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-            </div>
-        </div>
+    <div class="contact-method">
+      <div class="contact-icon">⏰</div>
+      <div><h4>Horario</h4><p>Lun-Vie: 9am - 6pm<br>Sáb: 10am - 2pm</p></div>
     </div>
-</main>
+  </div>
+
+  <form id="contactFormPage" action="https://formspree.io/f/tu-codigo-aqui" method="POST">
+    <div class="form-group">
+        <input type="text" name="nombre" id="fullName" placeholder="Nombre completo *" required>
+    </div>
+    <div class="form-group">
+        <input type="email" name="email" id="emailPage" placeholder="Correo electrónico *" required>
+    </div>
+    <div class="form-group">
+        <input type="tel" name="telefono" id="phone" placeholder="Teléfono">
+    </div>
+    <div class="form-group">
+        <input type="text" name="producto" id="productInterest" placeholder="Selecciona un producto de interés">
+    </div>
+    <div class="form-group">
+        <textarea rows="5" name="mensaje" id="messagePage" placeholder="Cuéntanos sobre tu proyecto..."></textarea>
+    </div>
+    <!-- Campo oculto para redirección después del envío -->
+    <input type="hidden" name="_next" value="https://tusitio.com/gracias.html">
+    <button type="submit" class="btn-send">Enviar mensaje</button>
+    <div id="formFeedbackPage" class="alert-msg"></div>
+</form>
+
 
 <footer>
-    <div class="container">
-        <p>© 2025 Grupo Impresión — Soluciones visuales profesionales</p>
-    </div>
+  © 2025 <span>Grupo InkColor</span> — Todos los derechos reservados.
 </footer>
 
 <script src="script.js"></script>
 <script>
-    // Detectar producto desde catálogo
-    const urlParams = new URLSearchParams(window.location.search);
-    const productParam = urlParams.get('producto');
-    if (productParam) {
-        const productSelect = document.getElementById('productInterest');
-        if (productSelect) {
-            for(let i = 0; i < productSelect.options.length; i++) {
-                if (productSelect.options[i].value === productParam || 
-                    productSelect.options[i].text === productParam ||
-                    productParam.includes(productSelect.options[i].value)) {
-                    productSelect.selectedIndex = i;
-                    break;
-                }
-            }
+  // Detectar producto desde el catálogo (si viene por URL)
+  const urlParams = new URLSearchParams(window.location.search);
+  const producto = urlParams.get('producto');
+  if (producto) {
+    const select = document.getElementById('productInterest');
+    if (select) {
+      for (let i = 0; i < select.options.length; i++) {
+        if (select.options[i].value === producto || select.options[i].text === producto) {
+          select.selectedIndex = i;
+          break;
         }
-        const messageField = document.getElementById('messagePage');
-        if (messageField && !messageField.value) {
-            messageField.value = `Hola, me interesa cotizar: ${productParam}`;
-        }
+      }
     }
+    const msgField = document.getElementById('messagePage');
+    if (msgField && !msgField.value) {
+      msgField.value = `Hola, me interesa cotizar: ${producto}`;
+    }
+  }
 </script>
 </body>
 </html>
