@@ -185,11 +185,11 @@ const productos = [
     },
     {
         id: 2,
-        nombre: "Pizarrón Académico",
-        categoria: "pizarrones",
-        descripcion: "Perfecto para escuelas y centros de capacitación. Superficie de alta durabilidad.",
-        caracteristicas: ["✔️ Incluye bandeja", "✔️ Fácil limpieza", "✔️ Instalación sencilla"],
-        imagen: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=400&q=80",
+        nombre: "Impresiones en Offset",
+        categoria: "impresiones",
+        descripcion: "Diseño e impresion en offset.",
+        caracteristicas: ["✔️ A medida", "✔️ Excelentes colores", "✔️ Alta calidad"],
+        imagen: "assets/catalogoIndex/impresion-offset.jpg",
         precio: "Cotizar"
     },
     {
@@ -236,6 +236,75 @@ const productos = [
         caracteristicas: ["✔️ Armado rápido", "✔️ Incluye maleta", "✔️ Impresión full color"],
         imagen: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&q=80",
         precio: "Cotizar"
+    },
+    {
+        id: 8,
+        nombre: "Stand Textil Ligero",
+        categoria: "stands",
+        descripcion: "Stands con impresión textil de alta definición. Modernos y ligeros.",
+        caracteristicas: ["✔️ Sin arrugas", "✔️ Montaje rápido", "✔️ Material ecológico"],
+        imagen: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=400&q=80",
+        precio: "Cotizar"
+    }
+];
+
+// ===== DATOS PARA EL INDEX (SERVICIOS Y CATÁLOGO) =====
+
+const servicios = [
+    {
+        id: 1,
+        titulo: "Diseño digital",
+        descripcion: "Diseño e impresión de piezas digitales de alta calidad para tu marca.",
+        imagen: "assets/servicios/servicio-diseno-digital.jpg",
+        icono: "fas fa-chalkboard",
+        categoria: "diseno-digital",
+        enlace: "catalogo.html#diseno-digital"
+    },
+    {
+        id: 2,
+        titulo: "Offset",
+        descripcion: "Impresión offset de alta calidad para grandes volúmenes con acabados profesionales.",
+        imagen: "assets/servicios/servicio-offset.jpg",
+        icono: "fas fa-signs-post",
+        categoria: "offset",
+        enlace: "catalogo.html#offset"
+    },
+    {
+        id: 3,
+        titulo: "Promocionales",
+        descripcion: "Productos promocionales personalizados para eventos y campañas de marketing.",
+        imagen: "assets/servicios/servicio-promocionales.jpg",
+        icono: "fas fa-tag",
+        categoria: "promocionales",
+        enlace: "catalogo.html#promocionales"
+    },
+    {
+        id: 4,
+        titulo: "Demo Stands",
+        descripcion: "Stands promocionales para eventos y exposiciones.",
+        imagen: "assets/servicios/servicio-stands.jpg",
+        icono: "fas fa-store-alt",
+        categoria: "stands",
+        enlace: "catalogo.html#stands"
+    }
+];
+
+const catalogosIndex = [
+    {
+        id: 1,
+        titulo: "Impresiones en Offset",
+        descripcion: "Diseño e impresion en offset.",
+        imagen: "assets/catalogoIndex/impresion-offset.jpg",
+        categoria: "impresiones",
+        enlace: "catalogo.html#impresiones"
+    },
+    {
+        id: 2,
+        titulo: "Señalética de seguridad",
+        descripcion: "Diseño y normas de señalética de seguridad.",
+        imagen: "assets/catalogoIndex/catalogo-senaletica.jpg",
+        categoria: "senaletica",
+        enlace: "catalogo.html#senaletica"
     }
 ];
 
@@ -304,4 +373,75 @@ if (document.querySelector('.catalog-filters')) {
             filtrarPorCategoria(filterValue);
         });
     });
+}
+
+
+// ===== RENDERIZAR SERVICIOS =====
+function renderizarServicios() {
+    const grid = document.getElementById('servicesGrid');
+    if (!grid) return;
+    
+    grid.innerHTML = servicios.map(servicio => `
+        <div class="service-card" data-category="${servicio.categoria}">
+            <div class="card-header">
+                <h3>${servicio.titulo}</h3>
+            </div>
+            <img class="card-img" 
+                 src="${servicio.imagen}" 
+                 alt="${servicio.titulo}" 
+                 onerror="this.src='https://via.placeholder.com/400x160/333/fff?text=${encodeURIComponent(servicio.titulo)}'">
+            <div class="card-body">
+                <h4>${servicio.titulo}</h4>
+                <p>${servicio.descripcion}</p>
+                <a href="${servicio.enlace}" class="btn-ver">Ver más</a>
+            </div>
+        </div>
+    `).join('');
+    
+    // Aplicar animación de entrada
+    document.querySelectorAll('#servicesGrid .service-card').forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        card.style.transition = `opacity 0.5s ease, transform 0.5s ease ${index * 0.1}s`;
+        setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, 100);
+    });
+}
+
+// ===== RENDERIZAR CATÁLOGO DEL INDEX =====
+function renderizarCatalogoIndex() {
+    const grid = document.getElementById('catalogGridIndex');
+    if (!grid) return;
+    
+    grid.innerHTML = catalogosIndex.map(catalogo => `
+        <div class="catalog-card" data-category="${catalogo.categoria}">
+            <img src="${catalogo.imagen}" 
+                 alt="${catalogo.titulo}" 
+                 onerror="this.src='https://via.placeholder.com/400x130/eee/333?text=${encodeURIComponent(catalogo.titulo)}'">
+            <div class="catalog-card-body">
+                <h4>${catalogo.titulo}</h4>
+                <p>${catalogo.descripcion}</p>
+                <a href="${catalogo.enlace}" class="btn-ver">Ver más</a>
+            </div>
+        </div>
+    `).join('');
+    
+    // Aplicar animación
+    document.querySelectorAll('#catalogGridIndex .catalog-card').forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = `opacity 0.5s ease, transform 0.5s ease ${index * 0.15}s`;
+        setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, 100);
+    });
+}
+
+// ===== INICIALIZAR INDEX =====
+if (document.getElementById('servicesGrid')) {
+    renderizarServicios();
+    renderizarCatalogoIndex();
 }
