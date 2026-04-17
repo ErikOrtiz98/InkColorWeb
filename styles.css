@@ -844,7 +844,6 @@ footer span {
 /* Tablets y pantallas medianas (max-width: 1199px) */
 @media (max-width: 1199px) {
     .ink-top-right {
-        top: 18vh;
         width: 48%;
         max-width: 450px;
     }
@@ -1045,7 +1044,6 @@ footer span {
 /* Pantallas muy grandes (min-width: 1920px) */
 @media (min-width: 1920px) {
     .ink-top-right {
-        top: 18vh;
         width: 35%;
         max-width: 600px;
     }
