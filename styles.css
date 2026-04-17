@@ -55,10 +55,9 @@ nav {
     align-items: center;
     justify-content: space-between;
     padding: 14px 48px;
-    background: rgba(255, 255, 255, 0.96);
-    backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(8px);
     box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
-    transition: box-shadow 0.2s;
     transition: all 0.3s ease;
     min-height: 100px;
 }
@@ -115,7 +114,7 @@ nav {
 
 /* ===== HERO ===== */
 .hero {
-    min-height: 100vh;
+    min-height: 150vh;
     padding-top: 160px;
     position: relative;
     overflow: hidden;
@@ -479,7 +478,7 @@ nav {
 /* ===== CONTACTO (INDEX) ===== */
 .contact {
     position: relative;
-    background: url('assets/fondo.png');
+    background: url('assets/images/fondo-contacto.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
