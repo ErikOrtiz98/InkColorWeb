@@ -445,3 +445,47 @@ if (document.getElementById('servicesGrid')) {
     renderizarServicios();
     renderizarCatalogoIndex();
 }
+
+// ===== MENÚ HAMBURGUESA =====
+const hamburger = document.getElementById('hamburger');
+const navLinks = document.getElementById('navLinks');
+
+if (hamburger && navLinks) {
+    // Crear overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'menu-overlay';
+    document.body.appendChild(overlay);
+    
+    // Abrir menú
+    hamburger.addEventListener('click', () => {
+        navLinks.classList.add('active');
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    });
+    
+    // Cerrar menú
+    function closeMenu() {
+        navLinks.classList.remove('active');
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    // Cerrar al hacer clic en un enlace
+    navLinks.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', closeMenu);
+    });
+    
+    // Cerrar al hacer clic en el overlay
+    overlay.addEventListener('click', closeMenu);
+}
+
+// Cerrar menú al redimensionar a desktop
+window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) {
+        const navLinks = document.getElementById('navLinks');
+        const overlay = document.querySelector('.menu-overlay');
+        if (navLinks) navLinks.classList.remove('active');
+        if (overlay) overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+});
