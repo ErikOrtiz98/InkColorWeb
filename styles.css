@@ -885,7 +885,7 @@ footer span {
         padding: 40px 24px;
     }
     .ink-top-right {
-        top: 110px;
+        top: 18vh;
         width: 70%;
         max-width: 550px;
         top: 140px;
@@ -905,7 +905,7 @@ footer span {
     nav {
         padding: 10px 20px;
         min-height: 80px;
-        background: rgba(255, 255, 255, 0.98);
+        background: rgba(0, 0, 0, 0);
     }
     .logo img {
         max-height: 80px;
@@ -997,10 +997,9 @@ footer span {
     .splash-3 { width: 60px; bottom: 10%; left: 5%; }
     .splash-4 { width: 45px; bottom: 20%; right: 2%; }
     .ink-top-right {
-        top: 90px;
+        top: 18vh;
         width: 75%;
         max-width: 350px;
-        top: 130px;
         right: -15px;
         opacity: 0.5;
     }
@@ -1029,7 +1028,7 @@ footer span {
         font-size: 0.85rem;
     }
     .ink-top-right {
-        top: 80px;
+        top: 18vh;
         width: 80%;
         max-width: 260px; 
         top: 140px;
@@ -1046,12 +1045,37 @@ footer span {
 /* Pantallas muy grandes (min-width: 1920px) */
 @media (min-width: 1920px) {
     .ink-top-right {
+        top: 18vh;
         width: 35%;
         max-width: 600px;
     }
     .ink-bottom-left {
         width: 28%;
         max-width: 450px;
+    }
+}
+
+/* Pantalla externa (plegado) */
+@media (max-width: 480px) {
+    .ink-top-right {
+        top: 18vh;
+        width: 65% !important;
+        max-width: 260px !important;
+    }
+}
+
+/* Pantalla interna (desplegado) */
+@media (min-width: 700px) and (max-width: 900px) {
+    .ink-top-right {
+        top: 18vh;
+        width: 55% !important;
+        max-width: 380px !important;
+    }
+    
+    .ink-bottom-left {
+        bottom: 90px !important;
+        width: 45% !important;
+        max-width: 280px !important;
     }
 }
 
