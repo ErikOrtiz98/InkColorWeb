@@ -844,6 +844,7 @@ footer span {
 /* Tablets y pantallas medianas (max-width: 1199px) */
 @media (max-width: 1199px) {
     .ink-top-right {
+        top: 120px;
         width: 48%;
         max-width: 450px;
     }
@@ -884,6 +885,7 @@ footer span {
         padding: 40px 24px;
     }
     .ink-top-right {
+        top: 110px;
         width: 70%;
         max-width: 550px;
         top: 140px;
@@ -995,6 +997,7 @@ footer span {
     .splash-3 { width: 60px; bottom: 10%; left: 5%; }
     .splash-4 { width: 45px; bottom: 20%; right: 2%; }
     .ink-top-right {
+        top: 90px;
         width: 75%;
         max-width: 350px;
         top: 130px;
@@ -1026,6 +1029,7 @@ footer span {
         font-size: 0.85rem;
     }
     .ink-top-right {
+        top: 80px;
         width: 80%;
         max-width: 260px; 
         top: 140px;
