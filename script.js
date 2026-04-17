@@ -1,4 +1,329 @@
-// Scroll reveal animation
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzyVP3pyA887MiiSuR0_kbMiv4Ce9PPyH8CsP0KP-x6XDxpZNuJ9kIRs9KNoSRgF3_Q/exec'; 
+
+// ===== VARIABLES GLOBALES =====
+let productos = [];
+let servicios = [];
+let categorias = [];
+let catalogosIndex = [];
+
+// ===== CARGAR DATOS DESDE APPS SCRIPT =====
+async function cargarDatos() {
+    mostrarLoader(true);
+    try {
+        const response = await fetch(APPS_SCRIPT_URL);
+        const data = await response.json();
+        
+        if (data.success) {
+            productos = data.productos || [];
+            servicios = data.servicios || [];
+            categorias = data.categorias || [];
+            catalogosIndex = data.catalogosIndex || [];
+            renderizarTodo();
+        } else {
+            console.error('Error:', data.error);
+        }
+    } catch (error) {
+        console.error('Error de conexión:', error);
+    }
+    mostrarLoader(false);
+}
+
+function mostrarLoader(mostrar) {
+    let loader = document.getElementById('globalLoader');
+    if (mostrar && !loader) {
+        loader = document.createElement('div');
+        loader.id = 'globalLoader';
+        loader.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:10000;';
+        loader.innerHTML = '<div style="background:#1e3c72;color:white;padding:20px 40px;border-radius:12px;">🔄 Cargando...</div>';
+        document.body.appendChild(loader);
+    } else if (!mostrar && loader) {
+        loader.remove();
+    }
+}
+
+function mostrarMensaje(texto, esError = false) {
+    const toast = document.createElement('div');
+    toast.style.cssText = `position:fixed;bottom:20px;right:20px;background:${esError ? '#c62828' : '#4caf50'};color:white;padding:12px 24px;border-radius:8px;z-index:10001;animation:fadeOut 3s ease forwards;`;
+    toast.innerHTML = esError ? '❌ ' + texto : '✅ ' + texto;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
+// ===== RENDERIZAR TODO =====
+function renderizarTodo() {
+    // Renderizar filtros dinámicos (solo en catalogo.html)
+    if (document.getElementById('catalogFilters')) {
+        renderizarFiltros();
+    }
+    
+    // Inicializar carrusel de servicios (solo en index.html)
+    if (document.getElementById('servicesCarousel')) {
+        renderizarServicios();
+        renderizarCatalogoIndex();
+    }
+    
+    // Inicializar catálogo dinámico (solo en catalogo.html)
+    if (document.getElementById('catalogGrid')) {
+        renderizarCatalogo();
+    }
+}
+
+// ===== FUNCIÓN PARA RENDERIZAR PRODUCTOS =====
+function renderizarCatalogo(productosFiltrados = null) {
+    const grid = document.getElementById('catalogGrid');
+    if (!grid) return;
+    
+    const productosAMostrar = productosFiltrados || productos;
+    
+    if (productosAMostrar.length === 0) {
+        grid.innerHTML = '<div class="no-results" style="grid-column: 1/-1; text-align: center; padding: 60px 20px;"><h3>No hay productos en esta categoría</h3><p>Pronto agregaremos más opciones para ti.</p></div>';
+        return;
+    }
+    
+    grid.innerHTML = productosAMostrar.map(producto => `
+        <div class="catalog-item-full" data-category="${producto.categoria}" data-id="${producto.id}">
+            <div class="card-header">
+                <h3>${producto.nombre.split(' ')[0]} ${producto.nombre.split(' ')[1] || ''}</h3>
+            </div>
+            <img class="card-img" src="${producto.imagen}" alt="${producto.nombre}" onerror="this.src='assets/images/placeholder.jpg'">
+            <div class="card-body">
+                <h4>${producto.nombre}</h4>
+                <p>${producto.descripcion}</p>
+                <div class="catalog-features">
+                    ${producto.caracteristicas ? producto.caracteristicas.split(',').map(c => `<span>${c.trim()}</span>`).join('') : ''}
+                </div>
+                <a href="contacto.html?producto=${encodeURIComponent(producto.nombre)}" class="btn-ver">Solicitar cotización</a>
+            </div>
+        </div>
+    `).join('');
+    
+    document.querySelectorAll('.catalog-item-full').forEach((item, index) => {
+        item.style.animation = `fadeInScale 0.3s ease ${index * 0.05}s forwards`;
+        item.style.opacity = '0';
+    });
+}
+
+// ===== FUNCIÓN PARA FILTRAR =====
+function filtrarPorCategoria(categoria) {
+    if (categoria === 'all') {
+        renderizarCatalogo(productos);
+    } else {
+        const filtrados = productos.filter(p => p.categoria === categoria);
+        renderizarCatalogo(filtrados);
+    }
+}
+
+// ===== RENDERIZAR CATÁLOGO DEL INDEX =====
+function renderizarCatalogoIndex() {
+    const grid = document.getElementById('catalogGridIndex');
+    if (!grid) return;
+    
+    grid.innerHTML = catalogosIndex.map(catalogo => `
+        <div class="catalog-card" data-category="${catalogo.categoria}">
+            <img src="${catalogo.imagen}" 
+                 alt="${catalogo.titulo}" 
+                 onerror="this.src='assets/images/placeholder.jpg'">
+            <div class="catalog-card-body">
+                <h4>${catalogo.titulo}</h4>
+                <p>${catalogo.descripcion}</p>
+                <a href="${catalogo.enlace}" class="btn-ver">Ver más</a>
+            </div>
+        </div>
+    `).join('');
+    
+    document.querySelectorAll('#catalogGridIndex .catalog-card').forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = `opacity 0.5s ease, transform 0.5s ease ${index * 0.15}s`;
+        setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, 100);
+    });
+}
+
+// ===== RENDERIZAR FILTROS DINÁMICOS =====
+function renderizarFiltros() {
+    const filtersContainer = document.getElementById('catalogFilters');
+    if (!filtersContainer) return;
+    
+    let buttonsHTML = `<button class="filter-btn active" data-filter="all">Todos</button>`;
+    
+    categorias.forEach(cat => {
+        buttonsHTML += `<button class="filter-btn" data-filter="${cat.slug}">${cat.nombre}</button>`;
+    });
+    
+    filtersContainer.innerHTML = buttonsHTML;
+    
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const filterValue = btn.getAttribute('data-filter');
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            filtrarPorCategoria(filterValue);
+        });
+    });
+}
+
+// ===== CARRUSEL INFINITO DE SERVICIOS =====
+let currentPosition = 0;
+let autoScrollInterval = null;
+let cardWidth = 0;
+let gap = 24;
+
+function renderizarServicios() {
+    const track = document.getElementById('servicesCarousel');
+    const dotsContainer = document.getElementById('servicesDots');
+    if (!track) return;
+    
+    const serviciosTriplicados = [...servicios, ...servicios, ...servicios];
+    
+    track.innerHTML = serviciosTriplicados.map((servicio, idx) => `
+        <div class="service-card" data-category="${servicio.categoria}" data-original-index="${idx % servicios.length}">
+            <div class="card-header">
+                <h3>${servicio.titulo}</h3>
+            </div>
+            <img class="card-img" 
+                 src="${servicio.imagen}" 
+                 alt="${servicio.titulo}" 
+                 onerror="this.src='assets/images/placeholder.jpg'">
+            <div class="card-body">
+                <h4>${servicio.titulo}</h4>
+                <p>${servicio.descripcion}</p>
+                <a href="${servicio.enlace}" class="btn-ver">Ver más</a>
+            </div>
+        </div>
+    `).join('');
+    
+    if (dotsContainer) {
+        dotsContainer.innerHTML = servicios.map((_, idx) => `
+            <div class="dot ${idx === 0 ? 'active' : ''}" data-index="${idx}"></div>
+        `).join('');
+    }
+    
+    const firstCard = track.querySelector('.service-card');
+    if (firstCard) {
+        cardWidth = firstCard.offsetWidth;
+    }
+    
+    const setWidth = servicios.length * (cardWidth + gap);
+    track.scrollLeft = setWidth;
+    currentPosition = setWidth;
+    
+    setupCarouselListeners();
+    startAutoScroll();
+}
+
+function setupCarouselListeners() {
+    const prevBtn = document.getElementById('prevService');
+    const nextBtn = document.getElementById('nextService');
+    const track = document.getElementById('servicesCarousel');
+    const dots = document.querySelectorAll('.dot');
+    
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => scrollServices(-1));
+    }
+    
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => scrollServices(1));
+    }
+    
+    if (track) {
+        track.addEventListener('scroll', () => {
+            updateActiveDot();
+            checkInfiniteScroll();
+        });
+        
+        track.addEventListener('mouseenter', stopAutoScroll);
+        track.addEventListener('mouseleave', startAutoScroll);
+        
+        let touchStartX = 0;
+        track.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+        
+        track.addEventListener('touchend', (e) => {
+            const touchEndX = e.changedTouches[0].screenX;
+            const diff = touchStartX - touchEndX;
+            if (Math.abs(diff) > 50) {
+                scrollServices(diff > 0 ? 1 : -1);
+            }
+        });
+    }
+    
+    dots.forEach(dot => {
+        dot.addEventListener('click', () => {
+            const index = parseInt(dot.getAttribute('data-index'));
+            scrollToService(index);
+        });
+    });
+}
+
+function scrollServices(direction) {
+    const track = document.getElementById('servicesCarousel');
+    if (!track) return;
+    const scrollAmount = (cardWidth + gap) * direction;
+    track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+}
+
+function scrollToService(index) {
+    const track = document.getElementById('servicesCarousel');
+    if (!track) return;
+    const setWidth = servicios.length * (cardWidth + gap);
+    const targetPosition = setWidth + (index * (cardWidth + gap));
+    track.scrollTo({ left: targetPosition, behavior: 'smooth' });
+}
+
+function updateActiveDot() {
+    const track = document.getElementById('servicesCarousel');
+    if (!track) return;
+    const setWidth = servicios.length * (cardWidth + gap);
+    const relativeScroll = track.scrollLeft - setWidth;
+    let activeIndex = Math.round(relativeScroll / (cardWidth + gap));
+    activeIndex = ((activeIndex % servicios.length) + servicios.length) % servicios.length;
+    
+    document.querySelectorAll('.dot').forEach((dot, idx) => {
+        if (idx === activeIndex) {
+            dot.classList.add('active');
+        } else {
+            dot.classList.remove('active');
+        }
+    });
+}
+
+function checkInfiniteScroll() {
+    const track = document.getElementById('servicesCarousel');
+    if (!track) return;
+    const totalWidth = track.scrollWidth;
+    const setWidth = servicios.length * (cardWidth + gap);
+    const scrollPos = track.scrollLeft;
+    
+    if (scrollPos >= totalWidth - setWidth - 100) {
+        track.scrollLeft = setWidth;
+    } else if (scrollPos <= 100) {
+        track.scrollLeft = totalWidth - (setWidth * 2);
+    }
+}
+
+function startAutoScroll() {
+    if (autoScrollInterval) clearInterval(autoScrollInterval);
+    autoScrollInterval = setInterval(() => {
+        const track = document.getElementById('servicesCarousel');
+        if (track && !track.matches(':hover')) {
+            scrollServices(1);
+        }
+    }, 5000);
+}
+
+function stopAutoScroll() {
+    if (autoScrollInterval) {
+        clearInterval(autoScrollInterval);
+        autoScrollInterval = null;
+    }
+}
+
+// ===== SCROLL REVEAL ANIMATION =====
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -15,7 +340,7 @@ document.querySelectorAll('.service-card, .catalog-card, .catalog-item-full, .co
     observer.observe(el);
 });
 
-// Navbar shadow on scroll
+// ===== NAVBAR SHADOW ON SCROLL =====
 window.addEventListener('scroll', () => {
     const nav = document.querySelector('nav');
     if (nav) {
@@ -23,12 +348,12 @@ window.addEventListener('scroll', () => {
     }
 });
 
-// Prevenir comportamiento por defecto de enlaces vacíos
+// ===== PREVENIR ENLACES VACÍOS =====
 document.querySelectorAll('a[href="#"]').forEach(a => {
     a.addEventListener('click', (e) => e.preventDefault());
 });
 
-// Marcar enlace activo en el menú
+// ===== MARCAR ENLACE ACTIVO =====
 const currentPage = window.location.pathname.split('/').pop() || 'index.html';
 document.querySelectorAll('.nav-links a').forEach(link => {
     const href = link.getAttribute('href');
@@ -39,7 +364,7 @@ document.querySelectorAll('.nav-links a').forEach(link => {
     }
 });
 
-// Barra de progreso de scroll
+// ===== BARRA DE PROGRESO =====
 const progressBar = document.createElement('div');
 progressBar.style.position = 'fixed';
 progressBar.style.top = '0';
@@ -58,83 +383,30 @@ window.addEventListener('scroll', () => {
     progressBar.style.width = scrolled + '%';
 });
 
-// Loader de página
-const loader = document.createElement('div');
-loader.style.position = 'fixed';
-loader.style.top = '0';
-loader.style.left = '0';
-loader.style.width = '100%';
-loader.style.height = '100%';
-loader.style.backgroundColor = '#fff';
-loader.style.display = 'flex';
-loader.style.alignItems = 'center';
-loader.style.justifyContent = 'center';
-loader.style.zIndex = '9999';
-loader.style.transition = 'opacity 0.5s';
-loader.innerHTML = '<div style="width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid #1565C0; border-radius: 50%; animation: spin 1s linear infinite;"></div>';
-document.body.appendChild(loader);
+// ===== LOADER DE PÁGINA =====
+const pageLoader = document.createElement('div');
+pageLoader.style.position = 'fixed';
+pageLoader.style.top = '0';
+pageLoader.style.left = '0';
+pageLoader.style.width = '100%';
+pageLoader.style.height = '100%';
+pageLoader.style.backgroundColor = '#fff';
+pageLoader.style.display = 'flex';
+pageLoader.style.alignItems = 'center';
+pageLoader.style.justifyContent = 'center';
+pageLoader.style.zIndex = '9999';
+pageLoader.style.transition = 'opacity 0.5s';
+pageLoader.innerHTML = '<div style="width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid #1565C0; border-radius: 50%; animation: spin 1s linear infinite;"></div>';
+document.body.appendChild(pageLoader);
 
 window.addEventListener('load', () => {
     setTimeout(() => {
-        loader.style.opacity = '0';
-        setTimeout(() => loader.remove(), 500);
+        pageLoader.style.opacity = '0';
+        setTimeout(() => pageLoader.remove(), 500);
     }, 300);
 });
 
-// ===== FILTROS DEL CATÁLOGO (CORREGIDO) =====
-if (document.querySelector('.catalog-filters')) {
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    const catalogItems = document.querySelectorAll('.catalog-item-full');
-    const catalogGrid = document.querySelector('.full-catalog-grid');
-
-    function filterCatalog(filterValue) {
-        let visibleCount = 0;
-        
-        catalogItems.forEach(item => {
-            const category = item.getAttribute('data-category');
-            
-            if (filterValue === 'all' || category === filterValue) {
-                item.style.display = 'flex';
-                item.style.opacity = '1';
-                item.style.order = visibleCount; // Mantiene el orden
-                visibleCount++;
-            } else {
-                item.style.display = 'none';
-                item.style.opacity = '0';
-            }
-        });
-        
-        // Si no hay elementos visibles, muestra un mensaje
-        if (visibleCount === 0) {
-            let noResultsMsg = document.querySelector('.no-results');
-            if (!noResultsMsg) {
-                noResultsMsg = document.createElement('div');
-                noResultsMsg.className = 'no-results';
-                noResultsMsg.innerHTML = '<p style="text-align: center; grid-column: 1/-1; padding: 40px;">No hay productos en esta categoría.</p>';
-                catalogGrid.appendChild(noResultsMsg);
-            }
-        } else {
-            const noResultsMsg = document.querySelector('.no-results');
-            if (noResultsMsg) noResultsMsg.remove();
-        }
-    }
-
-    filterBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const filterValue = btn.getAttribute('data-filter');
-            
-            // Actualizar botón activo
-            filterBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            
-            // Filtrar
-            filterCatalog(filterValue);
-        });
-    });
-}
-
-// Formulario de contacto
-// Formulario de contacto con Formspree
+// ===== FORMULARIO DE CONTACTO =====
 const contactForm = document.getElementById('contactFormPage');
 if (contactForm) {
     contactForm.addEventListener('submit', async (e) => {
@@ -142,7 +414,6 @@ if (contactForm) {
         const formData = new FormData(contactForm);
         const feedback = document.getElementById('formFeedbackPage');
         
-        // Mostrar loading
         const submitBtn = contactForm.querySelector('button[type="submit"]');
         const originalText = submitBtn.innerHTML;
         submitBtn.innerHTML = 'Enviando...';
@@ -172,503 +443,44 @@ if (contactForm) {
     });
 }
 
-// ===== CATÁLOGO DE PRODUCTOS (DINÁMICO) =====
-const productos = [
-    {
-        id: 1,
-        nombre: "Pizarrón Magnético Corporativo",
-        categoria: "pizarrones",
-        descripcion: "Ideal para oficinas y salas de juntas. Personalizable con tu logo.",
-        caracteristicas: ["✔️ Tamaños a medida", "✔️ Blanco o verde", "✔️ Marco de aluminio"],
-        imagen: "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=400&q=80",
-        precio: "Cotizar"
-    },
-    {
-        id: 2,
-        nombre: "Impresiones en Offset",
-        categoria: "impresiones",
-        descripcion: "Diseño e impresion en offset.",
-        caracteristicas: ["✔️ A medida", "✔️ Excelentes colores", "✔️ Alta calidad"],
-        imagen: "assets/catalogoIndex/impresion-offset.jpg",
-        precio: "Cotizar"
-    },
-    {
-        id: 3,
-        nombre: "Señales de Seguridad NOM",
-        categoria: "senaletica",
-        descripcion: "Señalamientos normados de prevención, obligación y emergencia.",
-        caracteristicas: ["✔️ Material reflectivo", "✔️ Tamaños personalizados", "✔️ Normas NOM"],
-        imagen: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80",
-        precio: "Cotizar"
-    },
-    {
-        id: 4,
-        nombre: "Señalética Direccional",
-        categoria: "senaletica",
-        descripcion: "Letreros y placas para orientación en centros comerciales y hospitales.",
-        caracteristicas: ["✔️ Diseño personalizado", "✔️ Bilingüe disponible", "✔️ Alta visibilidad"],
-        imagen: "https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?w=400&q=80",
-        precio: "Cotizar"
-    },
-    {
-        id: 5,
-        nombre: "Etiquetas Adhesivas Full Color",
-        categoria: "etiquetas",
-        descripcion: "Etiquetas personalizadas para productos y empaques. Alta calidad de impresión.",
-        caracteristicas: ["✔️ Resistentes al agua", "✔️ Troquelado personalizado", "✔️ Acabado mate/brillante"],
-        imagen: "https://images.unsplash.com/photo-1607082349566-187342175e2f?w=400&q=80",
-        precio: "Cotizar"
-    },
-    {
-        id: 6,
-        nombre: "Etiquetas con Código QR",
-        categoria: "etiquetas",
-        descripcion: "Etiquetas con código QR o barras para inventario y logística.",
-        caracteristicas: ["✔️ QR personalizado", "✔️ Numeración variable", "✔️ Alta durabilidad"],
-        imagen: "https://images.unsplash.com/photo-1585247226801-bc613c441316?w=400&q=80",
-        precio: "Cotizar"
-    },
-    {
-        id: 7,
-        nombre: "Stand Promocional para Ferias",
-        categoria: "stands",
-        descripcion: "Estructuras para exposiciones y eventos. Fáciles de armar y transportar.",
-        caracteristicas: ["✔️ Armado rápido", "✔️ Incluye maleta", "✔️ Impresión full color"],
-        imagen: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&q=80",
-        precio: "Cotizar"
-    },
-    {
-        id: 8,
-        nombre: "Stand Textil Ligero",
-        categoria: "stands",
-        descripcion: "Stands con impresión textil de alta definición. Modernos y ligeros.",
-        caracteristicas: ["✔️ Sin arrugas", "✔️ Montaje rápido", "✔️ Material ecológico"],
-        imagen: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=400&q=80",
-        precio: "Cotizar"
-    }
-];
-
-// ===== DATOS PARA EL INDEX (SERVICIOS Y CATÁLOGO) =====
-
-const servicios = [
-    {
-        id: 1,
-        titulo: "Diseño digital",
-        descripcion: "Diseño e impresión de piezas digitales de alta calidad para tu marca.",
-        imagen: "assets/servicios/servicio-diseno-digital.jpg",
-        icono: "fas fa-chalkboard",
-        categoria: "diseno-digital",
-        enlace: "catalogo.html#diseno-digital"
-    },
-    {
-        id: 2,
-        titulo: "Offset",
-        descripcion: "Impresión offset de alta calidad para grandes volúmenes con acabados profesionales.",
-        imagen: "assets/servicios/servicio-offset.jpg",
-        icono: "fas fa-signs-post",
-        categoria: "offset",
-        enlace: "catalogo.html#offset"
-    },
-    {
-        id: 3,
-        titulo: "Promocionales",
-        descripcion: "Productos promocionales personalizados para eventos y campañas de marketing.",
-        imagen: "assets/servicios/servicio-promocionales.jpg",
-        icono: "fas fa-tag",
-        categoria: "promocionales",
-        enlace: "catalogo.html#promocionales"
-    },
-    {
-        id: 4,
-        titulo: "Demo Stands",
-        descripcion: "Stands promocionales para eventos y exposiciones.",
-        imagen: "assets/servicios/servicio-stands.jpg",
-        icono: "fas fa-store-alt",
-        categoria: "stands",
-        enlace: "catalogo.html#stands"
-    }
-];
-
-const catalogosIndex = [
-    {
-        id: 1,
-        titulo: "Impresiones en Offset",
-        descripcion: "Diseño e impresion en offset.",
-        imagen: "assets/catalogoIndex/impresion-offset.jpg",
-        categoria: "impresiones",
-        enlace: "catalogo.html#impresiones"
-    },
-    {
-        id: 2,
-        titulo: "Señalética de seguridad",
-        descripcion: "Diseño y normas de señalética de seguridad.",
-        imagen: "assets/catalogoIndex/catalogo-senaletica.jpg",
-        categoria: "senaletica",
-        enlace: "catalogo.html#senaletica"
-    }
-];
-
-// ===== FUNCIÓN PARA RENDERIZAR PRODUCTOS =====
-function renderizarCatalogo(productosFiltrados = null) {
-    const grid = document.getElementById('catalogGrid');
-    if (!grid) return;
-    
-    const productosAMostrar = productosFiltrados || productos;
-    
-    if (productosAMostrar.length === 0) {
-        grid.innerHTML = '<div class="no-results" style="grid-column: 1/-1; text-align: center; padding: 60px 20px;"><h3>No hay productos en esta categoría</h3><p>Pronto agregaremos más opciones para ti.</p></div>';
-        return;
-    }
-    
-    grid.innerHTML = productosAMostrar.map(producto => `
-        <div class="catalog-item-full" data-category="${producto.categoria}" data-id="${producto.id}">
-            <div class="card-header">
-                <h3>${producto.nombre.split(' ')[0]} ${producto.nombre.split(' ')[1] || ''}</h3>
-            </div>
-            <img class="card-img" src="${producto.imagen}" alt="${producto.nombre}" onerror="this.src='https://via.placeholder.com/400x180/333/fff?text=${encodeURIComponent(producto.nombre)}'">
-            <div class="card-body">
-                <h4>${producto.nombre}</h4>
-                <p>${producto.descripcion}</p>
-                <div class="catalog-features">
-                    ${producto.caracteristicas.map(car => `<span>${car}</span>`).join('')}
-                </div>
-                <a href="contacto.html?producto=${encodeURIComponent(producto.nombre)}" class="btn-ver">Solicitar cotización</a>
-            </div>
-        </div>
-    `).join('');
-    
-    // Re-aplicar animación de entrada
-    document.querySelectorAll('.catalog-item-full').forEach((item, index) => {
-        item.style.animation = `fadeInScale 0.3s ease ${index * 0.05}s forwards`;
-        item.style.opacity = '0';
-    });
-}
-
-// ===== FUNCIÓN PARA FILTRAR =====
-function filtrarPorCategoria(categoria) {
-    if (categoria === 'all') {
-        renderizarCatalogo(productos);
-    } else {
-        const filtrados = productos.filter(p => p.categoria === categoria);
-        renderizarCatalogo(filtrados);
-    }
-}
-
-// ===== INICIALIZAR FILTROS =====
-if (document.querySelector('.catalog-filters')) {
-    // Renderizar productos al cargar
-    renderizarCatalogo();
-    
-    // Configurar botones de filtro
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    filterBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const filterValue = btn.getAttribute('data-filter');
-            
-            // Actualizar botón activo
-            filterBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            
-            // Filtrar
-            filtrarPorCategoria(filterValue);
-        });
-    });
-}
-
-
-// ===== CARRUSEL INFINITO DE SERVICIOS =====
-let currentPosition = 0;
-let autoScrollInterval = null;
-let cardWidth = 0;
-let gap = 24;
-
-function renderizarServicios() {
-    const track = document.getElementById('servicesCarousel');
-    const dotsContainer = document.getElementById('servicesDots');
-    if (!track) return;
-    
-    // Duplicar servicios 3 veces para efecto infinito
-    const serviciosTriplicados = [...servicios, ...servicios, ...servicios];
-    
-    track.innerHTML = serviciosTriplicados.map((servicio, idx) => `
-        <div class="service-card" data-category="${servicio.categoria}" data-original-index="${idx % servicios.length}">
-            <div class="card-header">
-                <h3>${servicio.titulo}</h3>
-            </div>
-            <img class="card-img" 
-                 src="${servicio.imagen}" 
-                 alt="${servicio.titulo}" 
-                 onerror="this.src='assets/images/placeholder.jpg'">
-            <div class="card-body">
-                <h4>${servicio.titulo}</h4>
-                <p>${servicio.descripcion}</p>
-                <a href="${servicio.enlace}" class="btn-ver">Ver más</a>
-            </div>
-        </div>
-    `).join('');
-    
-    // Crear dots
-    if (dotsContainer) {
-        dotsContainer.innerHTML = servicios.map((_, idx) => `
-            <div class="dot ${idx === 0 ? 'active' : ''}" data-index="${idx}"></div>
-        `).join('');
-    }
-    
-    // Calcular tamaño de tarjeta
-    const firstCard = track.querySelector('.service-card');
-    if (firstCard) {
-        cardWidth = firstCard.offsetWidth;
-    }
-    
-    // Posicionar en el medio (primer set completo)
-    const setWidth = servicios.length * (cardWidth + gap);
-    track.scrollLeft = setWidth;
-    currentPosition = setWidth;
-    
-    // Configurar listeners
-    setupCarouselListeners();
-    startAutoScroll();
-}
-
-function setupCarouselListeners() {
-    const prevBtn = document.getElementById('prevService');
-    const nextBtn = document.getElementById('nextService');
-    const track = document.getElementById('servicesCarousel');
-    const dots = document.querySelectorAll('.dot');
-    
-    if (prevBtn) {
-        prevBtn.addEventListener('click', () => scrollServices(-1));
-    }
-    
-    if (nextBtn) {
-        nextBtn.addEventListener('click', () => scrollServices(1));
-    }
-    
-    if (track) {
-        // Actualizar dots al hacer scroll
-        track.addEventListener('scroll', () => {
-            updateActiveDot();
-            checkInfiniteScroll();
-        });
-        
-        // Pausar auto-scroll al hover
-        track.addEventListener('mouseenter', stopAutoScroll);
-        track.addEventListener('mouseleave', startAutoScroll);
-        
-        // Swipe táctil
-        let touchStartX = 0;
-        track.addEventListener('touchstart', (e) => {
-            touchStartX = e.changedTouches[0].screenX;
-        });
-        
-        track.addEventListener('touchend', (e) => {
-            const touchEndX = e.changedTouches[0].screenX;
-            const diff = touchStartX - touchEndX;
-            if (Math.abs(diff) > 50) {
-                scrollServices(diff > 0 ? 1 : -1);
-            }
-        });
-    }
-    
-    dots.forEach(dot => {
-        dot.addEventListener('click', () => {
-            const index = parseInt(dot.getAttribute('data-index'));
-            scrollToService(index);
-        });
-    });
-}
-
-function scrollServices(direction) {
-    const track = document.getElementById('servicesCarousel');
-    if (!track) return;
-    
-    const scrollAmount = (cardWidth + gap) * direction;
-    track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-}
-
-function scrollToService(index) {
-    const track = document.getElementById('servicesCarousel');
-    if (!track) return;
-    
-    const setWidth = servicios.length * (cardWidth + gap);
-    const targetPosition = setWidth + (index * (cardWidth + gap));
-    track.scrollTo({ left: targetPosition, behavior: 'smooth' });
-}
-
-function updateActiveDot() {
-    const track = document.getElementById('servicesCarousel');
-    if (!track) return;
-    
-    const setWidth = servicios.length * (cardWidth + gap);
-    const relativeScroll = track.scrollLeft - setWidth;
-    let activeIndex = Math.round(relativeScroll / (cardWidth + gap));
-    
-    activeIndex = ((activeIndex % servicios.length) + servicios.length) % servicios.length;
-    
-    document.querySelectorAll('.dot').forEach((dot, idx) => {
-        if (idx === activeIndex) {
-            dot.classList.add('active');
-        } else {
-            dot.classList.remove('active');
-        }
-    });
-}
-
-function checkInfiniteScroll() {
-    const track = document.getElementById('servicesCarousel');
-    if (!track) return;
-    
-    const totalWidth = track.scrollWidth;
-    const setWidth = servicios.length * (cardWidth + gap);
-    const scrollPos = track.scrollLeft;
-    
-    // Si llegó al final, volver al principio del set central
-    if (scrollPos >= totalWidth - setWidth - 100) {
-        track.scrollLeft = setWidth;
-    }
-    // Si llegó al inicio, ir al final del set central
-    else if (scrollPos <= 100) {
-        track.scrollLeft = totalWidth - (setWidth * 2);
-    }
-}
-
-function startAutoScroll() {
-    if (autoScrollInterval) clearInterval(autoScrollInterval);
-    autoScrollInterval = setInterval(() => {
-        const track = document.getElementById('servicesCarousel');
-        if (track && !track.matches(':hover')) {
-            scrollServices(1);
-        }
-    }, 5000);
-}
-
-function stopAutoScroll() {
-    if (autoScrollInterval) {
-        clearInterval(autoScrollInterval);
-        autoScrollInterval = null;
-    }
-}
-
-
-// ===== RENDERIZAR CATÁLOGO DEL INDEX =====
-function renderizarCatalogoIndex() {
-    const grid = document.getElementById('catalogGridIndex');
-    if (!grid) return;
-    
-    grid.innerHTML = catalogosIndex.map(catalogo => `
-        <div class="catalog-card" data-category="${catalogo.categoria}">
-            <img src="${catalogo.imagen}" 
-                 alt="${catalogo.titulo}" 
-                 onerror="this.src='https://via.placeholder.com/400x130/eee/333?text=${encodeURIComponent(catalogo.titulo)}'">
-            <div class="catalog-card-body">
-                <h4>${catalogo.titulo}</h4>
-                <p>${catalogo.descripcion}</p>
-                <a href="${catalogo.enlace}" class="btn-ver">Ver más</a>
-            </div>
-        </div>
-    `).join('');
-    
-    // Aplicar animación
-    document.querySelectorAll('#catalogGridIndex .catalog-card').forEach((card, index) => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(20px)';
-        card.style.transition = `opacity 0.5s ease, transform 0.5s ease ${index * 0.15}s`;
-        setTimeout(() => {
-            card.style.opacity = '1';
-            card.style.transform = 'translateY(0)';
-        }, 100);
-    });
-}
-
-// ===== INICIALIZAR INDEX =====
-if (document.getElementById('servicesGrid')) {
-    renderizarServicios();
-    renderizarCatalogoIndex();
-}
-
 // ===== MENÚ HAMBURGUESA =====
 const hamburger = document.getElementById('hamburger');
 const navLinks = document.getElementById('navLinks');
 
 if (hamburger && navLinks) {
-    // Crear overlay
     const overlay = document.createElement('div');
     overlay.className = 'menu-overlay';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:999;display:none;';
     document.body.appendChild(overlay);
     
-    // Abrir menú
     hamburger.addEventListener('click', () => {
-        navLinks.classList.add('active');
-        overlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
+        navLinks.classList.toggle('active');
+        overlay.style.display = navLinks.classList.contains('active') ? 'block' : 'none';
+        document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : '';
     });
     
-    // Cerrar menú
-    function closeMenu() {
+    const closeMenu = () => {
         navLinks.classList.remove('active');
-        overlay.classList.remove('active');
+        overlay.style.display = 'none';
         document.body.style.overflow = '';
-    }
+    };
     
-    // Cerrar al hacer clic en un enlace
-    navLinks.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', closeMenu);
-    });
-    
-    // Cerrar al hacer clic en el overlay
+    navLinks.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
     overlay.addEventListener('click', closeMenu);
 }
 
-// Cerrar menú al redimensionar a desktop
-// ============================================
-// === INICIALIZACIÓN CUANDO EL DOM CARGA ===
-// ============================================
+// ===== CERRAR MENÚ AL REDIMENSIONAR =====
+window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) {
+        const navLinks = document.getElementById('navLinks');
+        const overlay = document.querySelector('.menu-overlay');
+        if (navLinks) navLinks.classList.remove('active');
+        if (overlay) overlay.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+});
+
+// ===== INICIALIZACIÓN PRINCIPAL =====
 document.addEventListener('DOMContentLoaded', function() {
-    
-    // 1. Carrusel de servicios (solo en index.html)
-    if (document.getElementById('servicesCarousel')) {
-        renderizarServicios();
-        renderizarCatalogoIndex();
-    }
-    
-    // 2. Catálogo dinámico (solo en catalogo.html)
-    if (document.getElementById('catalogGrid')) {
-        renderizarCatalogo();
-    }
-    
-    // 3. Menú hamburguesa
-    const hamburger = document.getElementById('hamburger');
-    const navLinks = document.getElementById('navLinks');
-    
-    if (hamburger && navLinks) {
-        const overlay = document.createElement('div');
-        overlay.className = 'menu-overlay';
-        document.body.appendChild(overlay);
-        
-        hamburger.addEventListener('click', () => {
-            navLinks.classList.add('active');
-            overlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        });
-        
-        const closeMenu = () => {
-            navLinks.classList.remove('active');
-            overlay.classList.remove('active');
-            document.body.style.overflow = '';
-        };
-        
-        navLinks.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
-        overlay.addEventListener('click', closeMenu);
-    }
-    
-    // 4. Cerrar menú al redimensionar a escritorio
-    window.addEventListener('resize', () => {
-        if (window.innerWidth > 768) {
-            const navLinks = document.getElementById('navLinks');
-            const overlay = document.querySelector('.menu-overlay');
-            if (navLinks) navLinks.classList.remove('active');
-            if (overlay) overlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-    });
+    cargarDatos();
 });
