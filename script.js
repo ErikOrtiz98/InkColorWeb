@@ -1,12 +1,11 @@
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzyVP3pyA887MiiSuR0_kbMiv4Ce9PPyH8CsP0KP-x6XDxpZNuJ9kIRs9KNoSRgF3_Q/exec'; 
-
 // ===== VARIABLES GLOBALES =====
 let productos = [];
 let servicios = [];
 let categorias = [];
 let catalogosIndex = [];
 
-// ===== CARGAR DATOS DESDE APPS SCRIPT =====
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzbpdnXpI2Q8t53fmoh5PUwY-zZ5VBgF62LS-tQMi9pnqBy44xnxRiU-AdtIJWf_6v_/exec?api=true';
+
 async function cargarDatos() {
     mostrarLoader(true);
     try {
@@ -484,3 +483,46 @@ window.addEventListener('resize', () => {
 document.addEventListener('DOMContentLoaded', function() {
     cargarDatos();
 });
+
+// ===== LOADER PERSONALIZADO CON TU IMAGEN =====
+function mostrarLoader(mostrar) {
+    let loader = document.getElementById('customLoader');
+    
+    if (mostrar && !loader) {
+        loader = document.createElement('div');
+        loader.id = 'customLoader';
+        loader.className = 'loader-overlay';
+        loader.innerHTML = `
+            <div class="loader-container">
+                <!-- TU IMAGEN EN LUGAR DEL TEXTO -->
+                <div class="loader-logo-img">
+                    <img src="assets/file_00000000a7e0722fa5edb0c7636377c4.png" alt="InkColor" class="logo-animated">
+                </div>
+                
+                <div class="ink-drops">
+                    <div class="drop"></div>
+                    <div class="drop"></div>
+                    <div class="drop"></div>
+                    <div class="drop"></div>
+                    <div class="drop"></div>
+                </div>
+                
+                <div class="loader-circle"></div>
+                <div class="loader-text">CARGANDO</div>
+            </div>
+        `;
+        document.body.appendChild(loader);
+        
+    } else if (!mostrar && loader) {
+        loader.classList.add('hidden');
+        setTimeout(() => {
+            if (loader && loader.remove) loader.remove();
+        }, 500);
+    }
+}
+
+// Eliminar el loader antiguo si existe
+const oldLoader = document.querySelector('div[style*="position: fixed"][style*="z-index: 9999"]');
+if (oldLoader && oldLoader.id !== 'customLoader') {
+    oldLoader.remove();
+}
