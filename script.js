@@ -4,10 +4,18 @@ let servicios = [];
 let categorias = [];
 let catalogosIndex = [];
 
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzbpdnXpI2Q8t53fmoh5PUwY-zZ5VBgF62LS-tQMi9pnqBy44xnxRiU-AdtIJWf_6v_/exec?api=true';
+const APPS_SCRIPT_URL = 'https://script.google.com/a/macros/inkcolor.com.mx/s/AKfycbwdbL7Kl8LTMaL1vf6JUcIE2IQXF-GMYyk_1be8ZV7EWLaI-srXzSCJDs8ULU8Fs772/exec?api=true';
 
+// ===== CARGA INTELIGENTE SIN PANTALLA DE CARGA =====
 async function cargarDatos() {
-    mostrarLoader(true);
+    // Verificar si ya hay datos en caché (para evitar mostrar loader)
+    const hayDatosEnCache = productos.length > 0 || servicios.length > 0;
+    
+    // Solo mostrar loader si no hay datos en caché
+    if (!hayDatosEnCache && !window.location.pathname.includes('contacto.html')) {
+        mostrarLoader(true);
+    }
+    
     try {
         const response = await fetch(APPS_SCRIPT_URL);
         const data = await response.json();
@@ -18,26 +26,43 @@ async function cargarDatos() {
             categorias = data.categorias || [];
             catalogosIndex = data.catalogosIndex || [];
             renderizarTodo();
-        } else {
-            console.error('Error:', data.error);
+            
+            // Pre-cargar imágenes en segundo plano
+            precargarImagenes();
         }
     } catch (error) {
-        console.error('Error de conexión:', error);
+        console.error('Error:', error);
     }
-    mostrarLoader(false);
+    
+    if (!hayDatosEnCache && !window.location.pathname.includes('contacto.html')) {
+        mostrarLoader(false);
+    }
 }
 
-function mostrarLoader(mostrar) {
-    let loader = document.getElementById('globalLoader');
-    if (mostrar && !loader) {
-        loader = document.createElement('div');
-        loader.id = 'globalLoader';
-        loader.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:10000;';
-        loader.innerHTML = '<div style="background:#1e3c72;color:white;padding:20px 40px;border-radius:12px;">🔄 Cargando...</div>';
-        document.body.appendChild(loader);
-    } else if (!mostrar && loader) {
-        loader.remove();
-    }
+// ===== PRECARGAR IMÁGENES EN SEGUNDO PLANO =====
+function precargarImagenes() {
+    const todasLasImagenes = [
+        ...productos.map(p => p.imagen),
+        ...servicios.map(s => s.imagen),
+        ...catalogosIndex.map(c => c.imagen)
+    ].filter(img => img && img.startsWith('http'));
+    
+    let imagenesCargadas = 0;
+    const totalImagenes = todasLasImagenes.length;
+    
+    todasLasImagenes.forEach(url => {
+        const img = new Image();
+        img.onload = () => {
+            imagenesCargadas++;
+            if (imagenesCargadas === totalImagenes) {
+                console.log('✅ Todas las imágenes pre-cargadas');
+            }
+        };
+        img.onerror = () => {
+            imagenesCargadas++;
+        };
+        img.src = url;
+    });
 }
 
 function mostrarMensaje(texto, esError = false) {
@@ -382,21 +407,6 @@ window.addEventListener('scroll', () => {
     progressBar.style.width = scrolled + '%';
 });
 
-// ===== LOADER DE PÁGINA =====
-const pageLoader = document.createElement('div');
-pageLoader.style.position = 'fixed';
-pageLoader.style.top = '0';
-pageLoader.style.left = '0';
-pageLoader.style.width = '100%';
-pageLoader.style.height = '100%';
-pageLoader.style.backgroundColor = '#fff';
-pageLoader.style.display = 'flex';
-pageLoader.style.alignItems = 'center';
-pageLoader.style.justifyContent = 'center';
-pageLoader.style.zIndex = '9999';
-pageLoader.style.transition = 'opacity 0.5s';
-pageLoader.innerHTML = '<div style="width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid #1565C0; border-radius: 50%; animation: spin 1s linear infinite;"></div>';
-document.body.appendChild(pageLoader);
 
 window.addEventListener('load', () => {
     setTimeout(() => {
@@ -484,8 +494,13 @@ document.addEventListener('DOMContentLoaded', function() {
     cargarDatos();
 });
 
-// ===== LOADER PERSONALIZADO CON TU IMAGEN =====
+// ===== LOADER PERSONALIZADO (solo para index y catalogo) =====
 function mostrarLoader(mostrar) {
+    // No mostrar loader en la página de contacto
+    if (window.location.pathname.includes('contacto.html')) {
+        return;
+    }
+    
     let loader = document.getElementById('customLoader');
     
     if (mostrar && !loader) {
@@ -494,11 +509,9 @@ function mostrarLoader(mostrar) {
         loader.className = 'loader-overlay';
         loader.innerHTML = `
             <div class="loader-container">
-                <!-- TU IMAGEN EN LUGAR DEL TEXTO -->
                 <div class="loader-logo-img">
                     <img src="assets/file_00000000a7e0722fa5edb0c7636377c4.png" alt="InkColor" class="logo-animated">
                 </div>
-                
                 <div class="ink-drops">
                     <div class="drop"></div>
                     <div class="drop"></div>
@@ -506,7 +519,6 @@ function mostrarLoader(mostrar) {
                     <div class="drop"></div>
                     <div class="drop"></div>
                 </div>
-                
                 <div class="loader-circle"></div>
                 <div class="loader-text">CARGANDO</div>
             </div>
@@ -521,8 +533,34 @@ function mostrarLoader(mostrar) {
     }
 }
 
-// Eliminar el loader antiguo si existe
-const oldLoader = document.querySelector('div[style*="position: fixed"][style*="z-index: 9999"]');
-if (oldLoader && oldLoader.id !== 'customLoader') {
-    oldLoader.remove();
+// Loader de página inicial (solo para index y catalogo)
+const pageLoader = document.createElement('div');
+pageLoader.style.position = 'fixed';
+pageLoader.style.top = '0';
+pageLoader.style.left = '0';
+pageLoader.style.width = '100%';
+pageLoader.style.height = '100%';
+pageLoader.style.backgroundColor = '#fff';
+pageLoader.style.display = 'flex';
+pageLoader.style.alignItems = 'center';
+pageLoader.style.justifyContent = 'center';
+pageLoader.style.zIndex = '9999';
+pageLoader.style.transition = 'opacity 0.5s';
+pageLoader.innerHTML = '<div style="width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid #1565C0; border-radius: 50%; animation: spin 1s linear infinite;"></div>';
+
+// Solo agregar loader si no es la página de contacto
+if (!window.location.pathname.includes('contacto.html')) {
+    document.body.appendChild(pageLoader);
 }
+
+window.addEventListener('load', () => {
+    if (!window.location.pathname.includes('contacto.html')) {
+        setTimeout(() => {
+            pageLoader.style.opacity = '0';
+            setTimeout(() => pageLoader.remove(), 500);
+        }, 300);
+    } else if (pageLoader) {
+        pageLoader.remove();
+    }
+});
+
