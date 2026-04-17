@@ -118,7 +118,7 @@ nav {
     min-height: 100vh;
     padding-top: 160px;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
     background: #fff;
     display: flex;
     align-items: center;
@@ -130,6 +130,7 @@ nav {
     padding: 0 48px;
     max-width: 560px;
     animation: fadeInUp 0.8s ease both;
+    color: #000000;
 }
 
 @keyframes fadeInUp {
@@ -148,7 +149,7 @@ nav {
 
 .hero-content p {
     font-size: 1.05rem;
-    color: #555;
+    color: #000000;
     margin-bottom: 32px;
     line-height: 1.6;
 }
@@ -193,24 +194,23 @@ nav {
 /* ===== MANCHAS PRINCIPALES ===== */
 .ink-top-right {
     position: absolute;
-    top: 150px;
+    top: 120px;
     right: 0;
     width: 80% !important;
     max-width: 900px !important;
     height: auto;
-    z-index: 1;
+    z-index: 5;
     opacity: 0.85;
     pointer-events: none;
 }
-
 .ink-bottom-left {
     position: absolute;
-    bottom: 80px;
+    bottom: 60px;
     left: -30px;
     width: 70% !important;
     max-width: 700px !important;
     height: auto;
-    z-index: 1;
+    z-index: 5;
     opacity: 0.8;
     pointer-events: none;
 }
