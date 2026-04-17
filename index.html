@@ -47,11 +47,21 @@
   </section>
 
 <!-- SERVICES -->
+<!-- SECCIÓN SERVICIOS -->
 <section class="services">
-    <h2 class="section-title">Nuestros Servicios</h2>
-    <p class="section-sub">Ofrecemos una amplia gama de soluciones de impresión, adaptadas a las necesidades de cada cliente.</p>
-    <div class="services-grid" id="servicesGrid"></div>
-  </section>
+  <h2 class="section-title">Nuestros Servicios</h2>
+  <p class="section-sub">Ofrecemos una amplia gama de soluciones de impresión, adaptadas a las necesidades de cada cliente.</p>
+  
+  <div class="carousel-container">
+    <button class="carousel-btn prev" id="prevService">❮</button>
+    <div class="carousel-track" id="servicesCarousel">
+      <!-- Los servicios se generarán aquí con JS -->
+    </div>
+    <button class="carousel-btn next" id="nextService">❯</button>
+  </div>
+  
+  <div class="carousel-dots" id="servicesDots"></div>
+</section>
 
 <!-- CATALOG + CONTACT (sección de dos columnas) -->
 <div class="bottom-section">

@@ -376,20 +376,29 @@ if (document.querySelector('.catalog-filters')) {
 }
 
 
-// ===== RENDERIZAR SERVICIOS =====
+// ===== CARRUSEL INFINITO DE SERVICIOS =====
+let currentPosition = 0;
+let autoScrollInterval = null;
+let cardWidth = 0;
+let gap = 24;
+
 function renderizarServicios() {
-    const grid = document.getElementById('servicesGrid');
-    if (!grid) return;
+    const track = document.getElementById('servicesCarousel');
+    const dotsContainer = document.getElementById('servicesDots');
+    if (!track) return;
     
-    grid.innerHTML = servicios.map(servicio => `
-        <div class="service-card" data-category="${servicio.categoria}">
+    // Duplicar servicios 3 veces para efecto infinito
+    const serviciosTriplicados = [...servicios, ...servicios, ...servicios];
+    
+    track.innerHTML = serviciosTriplicados.map((servicio, idx) => `
+        <div class="service-card" data-category="${servicio.categoria}" data-original-index="${idx % servicios.length}">
             <div class="card-header">
                 <h3>${servicio.titulo}</h3>
             </div>
             <img class="card-img" 
                  src="${servicio.imagen}" 
                  alt="${servicio.titulo}" 
-                 onerror="this.src='https://via.placeholder.com/400x160/333/fff?text=${encodeURIComponent(servicio.titulo)}'">
+                 onerror="this.src='assets/images/placeholder.jpg'">
             <div class="card-body">
                 <h4>${servicio.titulo}</h4>
                 <p>${servicio.descripcion}</p>
@@ -398,17 +407,148 @@ function renderizarServicios() {
         </div>
     `).join('');
     
-    // Aplicar animación de entrada
-    document.querySelectorAll('#servicesGrid .service-card').forEach((card, index) => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(30px)';
-        card.style.transition = `opacity 0.5s ease, transform 0.5s ease ${index * 0.1}s`;
-        setTimeout(() => {
-            card.style.opacity = '1';
-            card.style.transform = 'translateY(0)';
-        }, 100);
+    // Crear dots
+    if (dotsContainer) {
+        dotsContainer.innerHTML = servicios.map((_, idx) => `
+            <div class="dot ${idx === 0 ? 'active' : ''}" data-index="${idx}"></div>
+        `).join('');
+    }
+    
+    // Calcular tamaño de tarjeta
+    const firstCard = track.querySelector('.service-card');
+    if (firstCard) {
+        cardWidth = firstCard.offsetWidth;
+    }
+    
+    // Posicionar en el medio (primer set completo)
+    const setWidth = servicios.length * (cardWidth + gap);
+    track.scrollLeft = setWidth;
+    currentPosition = setWidth;
+    
+    // Configurar listeners
+    setupCarouselListeners();
+    startAutoScroll();
+}
+
+function setupCarouselListeners() {
+    const prevBtn = document.getElementById('prevService');
+    const nextBtn = document.getElementById('nextService');
+    const track = document.getElementById('servicesCarousel');
+    const dots = document.querySelectorAll('.dot');
+    
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => scrollServices(-1));
+    }
+    
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => scrollServices(1));
+    }
+    
+    if (track) {
+        // Actualizar dots al hacer scroll
+        track.addEventListener('scroll', () => {
+            updateActiveDot();
+            checkInfiniteScroll();
+        });
+        
+        // Pausar auto-scroll al hover
+        track.addEventListener('mouseenter', stopAutoScroll);
+        track.addEventListener('mouseleave', startAutoScroll);
+        
+        // Swipe táctil
+        let touchStartX = 0;
+        track.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+        
+        track.addEventListener('touchend', (e) => {
+            const touchEndX = e.changedTouches[0].screenX;
+            const diff = touchStartX - touchEndX;
+            if (Math.abs(diff) > 50) {
+                scrollServices(diff > 0 ? 1 : -1);
+            }
+        });
+    }
+    
+    dots.forEach(dot => {
+        dot.addEventListener('click', () => {
+            const index = parseInt(dot.getAttribute('data-index'));
+            scrollToService(index);
+        });
     });
 }
+
+function scrollServices(direction) {
+    const track = document.getElementById('servicesCarousel');
+    if (!track) return;
+    
+    const scrollAmount = (cardWidth + gap) * direction;
+    track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+}
+
+function scrollToService(index) {
+    const track = document.getElementById('servicesCarousel');
+    if (!track) return;
+    
+    const setWidth = servicios.length * (cardWidth + gap);
+    const targetPosition = setWidth + (index * (cardWidth + gap));
+    track.scrollTo({ left: targetPosition, behavior: 'smooth' });
+}
+
+function updateActiveDot() {
+    const track = document.getElementById('servicesCarousel');
+    if (!track) return;
+    
+    const setWidth = servicios.length * (cardWidth + gap);
+    const relativeScroll = track.scrollLeft - setWidth;
+    let activeIndex = Math.round(relativeScroll / (cardWidth + gap));
+    
+    activeIndex = ((activeIndex % servicios.length) + servicios.length) % servicios.length;
+    
+    document.querySelectorAll('.dot').forEach((dot, idx) => {
+        if (idx === activeIndex) {
+            dot.classList.add('active');
+        } else {
+            dot.classList.remove('active');
+        }
+    });
+}
+
+function checkInfiniteScroll() {
+    const track = document.getElementById('servicesCarousel');
+    if (!track) return;
+    
+    const totalWidth = track.scrollWidth;
+    const setWidth = servicios.length * (cardWidth + gap);
+    const scrollPos = track.scrollLeft;
+    
+    // Si llegó al final, volver al principio del set central
+    if (scrollPos >= totalWidth - setWidth - 100) {
+        track.scrollLeft = setWidth;
+    }
+    // Si llegó al inicio, ir al final del set central
+    else if (scrollPos <= 100) {
+        track.scrollLeft = totalWidth - (setWidth * 2);
+    }
+}
+
+function startAutoScroll() {
+    if (autoScrollInterval) clearInterval(autoScrollInterval);
+    autoScrollInterval = setInterval(() => {
+        const track = document.getElementById('servicesCarousel');
+        if (track && !track.matches(':hover')) {
+            scrollServices(1);
+        }
+    }, 5000);
+}
+
+function stopAutoScroll() {
+    if (autoScrollInterval) {
+        clearInterval(autoScrollInterval);
+        autoScrollInterval = null;
+    }
+}
+
 
 // ===== RENDERIZAR CATÁLOGO DEL INDEX =====
 function renderizarCatalogoIndex() {
@@ -480,12 +620,55 @@ if (hamburger && navLinks) {
 }
 
 // Cerrar menú al redimensionar a desktop
-window.addEventListener('resize', () => {
-    if (window.innerWidth > 768) {
-        const navLinks = document.getElementById('navLinks');
-        const overlay = document.querySelector('.menu-overlay');
-        if (navLinks) navLinks.classList.remove('active');
-        if (overlay) overlay.classList.remove('active');
-        document.body.style.overflow = '';
+// ============================================
+// === INICIALIZACIÓN CUANDO EL DOM CARGA ===
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // 1. Carrusel de servicios (solo en index.html)
+    if (document.getElementById('servicesCarousel')) {
+        renderizarServicios();
+        renderizarCatalogoIndex();
     }
+    
+    // 2. Catálogo dinámico (solo en catalogo.html)
+    if (document.getElementById('catalogGrid')) {
+        renderizarCatalogo();
+    }
+    
+    // 3. Menú hamburguesa
+    const hamburger = document.getElementById('hamburger');
+    const navLinks = document.getElementById('navLinks');
+    
+    if (hamburger && navLinks) {
+        const overlay = document.createElement('div');
+        overlay.className = 'menu-overlay';
+        document.body.appendChild(overlay);
+        
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        
+        const closeMenu = () => {
+            navLinks.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        };
+        
+        navLinks.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
+        overlay.addEventListener('click', closeMenu);
+    }
+    
+    // 4. Cerrar menú al redimensionar a escritorio
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            const navLinks = document.getElementById('navLinks');
+            const overlay = document.querySelector('.menu-overlay');
+            if (navLinks) navLinks.classList.remove('active');
+            if (overlay) overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
 });
