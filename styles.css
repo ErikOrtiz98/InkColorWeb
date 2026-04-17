@@ -175,10 +175,10 @@ nav {
 
 .ink-top-right {
     position: absolute;
-    top: 150px;
+    top: 60px;
     right: 0;
-    width: 100%;
-    max-width: 2000px;
+    width: 45%;
+    max-width: 500px;
     height: auto;
     z-index: 1;
     opacity: 0.85;
@@ -214,12 +214,69 @@ nav {
     position: absolute;
     bottom: 80px;
     left: -30px;
-    width: 70%;
-    max-width: 1000px;
+    width: 35%;
+    max-width: 380px;
     height: auto;
     z-index: 1;
     opacity: 0.8;
     pointer-events: none;
+}
+/* ===== RESPONSIVE PARA TABLETS (max-width: 900px) ===== */
+@media (max-width: 900px) {
+    .ink-top-right {
+        width: 55%;
+        max-width: 400px;
+        top: 100px;
+        opacity: 0.7;
+    }
+    
+    .ink-bottom-left {
+        width: 45%;
+        max-width: 300px;
+        bottom: 60px;
+        left: -40px;
+        opacity: 0.7;
+    }
+}
+
+/* ===== RESPONSIVE PARA MÓVILES (max-width: 768px) ===== */
+@media (max-width: 768px) {
+    .ink-top-right {
+        width: 70%;
+        max-width: 280px;
+        top: 120px;
+        right: -30px;
+        opacity: 0.5;
+    }
+    
+    .ink-bottom-left {
+        width: 60%;
+        max-width: 220px;
+        bottom: 100px;
+        left: -40px;
+        opacity: 0.5;
+    }
+}
+
+/* ===== RESPONSIVE PARA MÓVILES PEQUEÑOS (max-width: 480px) ===== */
+@media (max-width: 480px) {
+    .ink-top-right {
+        width: 80%;
+        max-width: 200px;
+        top: 100px;
+        right: -20px;
+        opacity: 0.4;
+        display: none; /* Opcional: ocultar en móviles muy pequeños */
+    }
+    
+    .ink-bottom-left {
+        width: 70%;
+        max-width: 180px;
+        bottom: 80px;
+        left: -30px;
+        opacity: 0.4;
+        display: none; /* Opcional: ocultar en móviles muy pequeños */
+    }
 }
 
 .hero-content {
@@ -603,6 +660,64 @@ nav {
     .splash-3 { width: 60px; bottom: 10%; left: 5%; }
     .splash-4 { width: 45px; bottom: 20%; right: 2%; }
 }
+/* ===== CONTACTO RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .contact {
+        padding: 40px 20px;
+        min-height: auto;
+    }
+    
+    .contact h2 {
+        font-size: 1.6rem;
+    }
+    
+    .contact > p {
+        font-size: 0.85rem;
+        margin-bottom: 20px;
+    }
+    
+    .contact-btns {
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+        max-width: 250px;
+    }
+    
+    .contact-btn {
+        flex-direction: row;
+        justify-content: center;
+        gap: 12px;
+        padding: 12px 20px;
+        min-width: auto;
+    }
+    
+    .contact-btn .icon {
+        font-size: 1.2rem;
+        margin-bottom: 0;
+    }
+    
+    .btn-send {
+        width: 100%;
+        max-width: 250px;
+        padding: 12px 20px;
+        font-size: 0.9rem;
+    }
+    
+    .printer-img {
+        width: 150px;
+        opacity: 0.3;
+    }
+    
+    /* Manchas decorativas del contacto */
+    .contact-splash {
+        opacity: 0.3;
+    }
+    
+    .splash-1 { width: 50px; top: 5%; left: 2%; }
+    .splash-2 { width: 40px; top: 15%; right: 2%; }
+    .splash-3 { width: 60px; bottom: 10%; left: 5%; }
+    .splash-4 { width: 45px; bottom: 20%; right: 2%; }
+}
 
 .contact h2 {
     position: relative;
@@ -924,6 +1039,32 @@ footer span {
         padding: 40px 24px;
     }
 }
+/* ===== BOTTOM SECTION RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .bottom-section {
+        grid-template-columns: 1fr;
+        min-height: auto;
+    }
+    
+    .catalog {
+        padding: 40px 24px;
+    }
+    
+    .catalog h2 {
+        font-size: 1.8rem;
+        text-align: center;
+    }
+    
+    .catalog p {
+        text-align: center;
+        font-size: 0.85rem;
+    }
+    
+    .catalog-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+}
 
 @media (max-width: 768px) {
     .ink-top-right {
@@ -1033,4 +1174,44 @@ button,
 /* Permitir selección solo en títulos importantes */
 h1, h2, h3, h4, p, .hero-content {
     user-select: text;
+}
+
+/* Control de tamaño según resolución */
+@media (min-width: 1920px) {
+    /* Pantallas grandes (4K) */
+    .ink-top-right {
+        width: 35%;
+        max-width: 600px;
+    }
+    
+    .ink-bottom-left {
+        width: 28%;
+        max-width: 450px;
+    }
+}
+
+@media (min-width: 1200px) and (max-width: 1919px) {
+    /* Pantallas de escritorio normales */
+    .ink-top-right {
+        width: 40%;
+        max-width: 500px;
+    }
+    
+    .ink-bottom-left {
+        width: 32%;
+        max-width: 380px;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1199px) {
+    /* Tablets grandes */
+    .ink-top-right {
+        width: 48%;
+        max-width: 450px;
+    }
+    
+    .ink-bottom-left {
+        width: 38%;
+        max-width: 320px;
+    }
 }
