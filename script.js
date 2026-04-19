@@ -375,13 +375,13 @@ function checkInfiniteScroll() {
     const totalWidth = track.scrollWidth;
     
     // Si llegó al final, volver al primer set
-    //if (scrollPos >= totalWidth - setWidth - 100) {
-        //track.scrollLeft = setWidth;
-    //}
+    if (scrollPos >= totalWidth - setWidth - 100) {
+        track.scrollLeft = setWidth;
+    }
     // Si llegó al inicio, ir al penúltimo set
-    //else if (scrollPos <= 100) {
-        //track.scrollLeft = totalWidth - (setWidth * 2);
-    //}
+    else if (scrollPos <= 100) {
+        track.scrollLeft = totalWidth - (setWidth * 2);
+    }
 }
 
 function startAutoScroll() {
