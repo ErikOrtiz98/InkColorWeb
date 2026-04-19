@@ -191,6 +191,7 @@ function renderizarFiltros() {
 }
 
 // ===== CARRUSEL INFINITO DE SERVICIOS =====
+// ===== CARRUSEL INFINITO DE SERVICIOS =====
 let currentPosition = 0;
 let autoScrollInterval = null;
 let cardWidth = 0;
@@ -201,6 +202,7 @@ function renderizarServicios() {
     const dotsContainer = document.getElementById('servicesDots');
     if (!track) return;
     
+    // Duplicar servicios 3 veces para efecto infinito
     const serviciosTriplicados = [...servicios, ...servicios, ...servicios];
     
     track.innerHTML = serviciosTriplicados.map((servicio, idx) => `
@@ -220,21 +222,25 @@ function renderizarServicios() {
         </div>
     `).join('');
     
+    // Crear dots
     if (dotsContainer) {
         dotsContainer.innerHTML = servicios.map((_, idx) => `
             <div class="dot ${idx === 0 ? 'active' : ''}" data-index="${idx}"></div>
         `).join('');
     }
     
+    // Calcular tamaño de tarjeta
     const firstCard = track.querySelector('.service-card');
     if (firstCard) {
         cardWidth = firstCard.offsetWidth;
     }
     
+    // Posicionar en el medio (primer set completo)
     const setWidth = servicios.length * (cardWidth + gap);
     track.scrollLeft = setWidth;
     currentPosition = setWidth;
     
+    // Configurar listeners
     setupCarouselListeners();
     startAutoScroll();
 }
@@ -245,12 +251,30 @@ function setupCarouselListeners() {
     const track = document.getElementById('servicesCarousel');
     const dots = document.querySelectorAll('.dot');
     
+    let userInteractionTimeout;
+    
+    function markUserInteraction() {
+        if (track) {
+            track.setAttribute('data-user-interacting', 'true');
+            clearTimeout(userInteractionTimeout);
+            userInteractionTimeout = setTimeout(() => {
+                if (track) track.removeAttribute('data-user-interacting');
+            }, 3000);
+        }
+    }
+    
     if (prevBtn) {
-        prevBtn.addEventListener('click', () => scrollServices(-1));
+        prevBtn.addEventListener('click', () => {
+            markUserInteraction();
+            scrollServices(-1);
+        });
     }
     
     if (nextBtn) {
-        nextBtn.addEventListener('click', () => scrollServices(1));
+        nextBtn.addEventListener('click', () => {
+            markUserInteraction();
+            scrollServices(1);
+        });
     }
     
     if (track) {
@@ -262,9 +286,13 @@ function setupCarouselListeners() {
         track.addEventListener('mouseenter', stopAutoScroll);
         track.addEventListener('mouseleave', startAutoScroll);
         
+        track.addEventListener('mousedown', markUserInteraction);
+        track.addEventListener('touchstart', markUserInteraction);
+        
         let touchStartX = 0;
         track.addEventListener('touchstart', (e) => {
             touchStartX = e.changedTouches[0].screenX;
+            markUserInteraction();
         });
         
         track.addEventListener('touchend', (e) => {
@@ -279,6 +307,7 @@ function setupCarouselListeners() {
     dots.forEach(dot => {
         dot.addEventListener('click', () => {
             const index = parseInt(dot.getAttribute('data-index'));
+            markUserInteraction();
             scrollToService(index);
         });
     });
@@ -287,21 +316,42 @@ function setupCarouselListeners() {
 function scrollServices(direction) {
     const track = document.getElementById('servicesCarousel');
     if (!track) return;
+    
+    stopAutoScroll();
+    
     const scrollAmount = (cardWidth + gap) * direction;
     track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    
+    setTimeout(() => {
+        const track = document.getElementById('servicesCarousel');
+        if (track && !track.hasAttribute('data-user-interacting')) {
+            startAutoScroll();
+        }
+    }, 3000);
 }
 
 function scrollToService(index) {
     const track = document.getElementById('servicesCarousel');
     if (!track) return;
+    
+    stopAutoScroll();
+    
     const setWidth = servicios.length * (cardWidth + gap);
     const targetPosition = setWidth + (index * (cardWidth + gap));
     track.scrollTo({ left: targetPosition, behavior: 'smooth' });
+    
+    setTimeout(() => {
+        const track = document.getElementById('servicesCarousel');
+        if (track && !track.hasAttribute('data-user-interacting')) {
+            startAutoScroll();
+        }
+    }, 3000);
 }
 
 function updateActiveDot() {
     const track = document.getElementById('servicesCarousel');
     if (!track) return;
+    
     const setWidth = servicios.length * (cardWidth + gap);
     const relativeScroll = track.scrollLeft - setWidth;
     let activeIndex = Math.round(relativeScroll / (cardWidth + gap));
@@ -319,13 +369,17 @@ function updateActiveDot() {
 function checkInfiniteScroll() {
     const track = document.getElementById('servicesCarousel');
     if (!track) return;
-    const totalWidth = track.scrollWidth;
-    const setWidth = servicios.length * (cardWidth + gap);
-    const scrollPos = track.scrollLeft;
     
+    const scrollPos = track.scrollLeft;
+    const setWidth = servicios.length * (cardWidth + gap);
+    const totalWidth = track.scrollWidth;
+    
+    // Si llegó al final, volver al primer set
     if (scrollPos >= totalWidth - setWidth - 100) {
         track.scrollLeft = setWidth;
-    } else if (scrollPos <= 100) {
+    }
+    // Si llegó al inicio, ir al penúltimo set
+    else if (scrollPos <= 100) {
         track.scrollLeft = totalWidth - (setWidth * 2);
     }
 }
@@ -334,7 +388,7 @@ function startAutoScroll() {
     if (autoScrollInterval) clearInterval(autoScrollInterval);
     autoScrollInterval = setInterval(() => {
         const track = document.getElementById('servicesCarousel');
-        if (track && !track.matches(':hover')) {
+        if (track && !track.matches(':hover') && !track.hasAttribute('data-user-interacting')) {
             scrollServices(1);
         }
     }, 5000);
