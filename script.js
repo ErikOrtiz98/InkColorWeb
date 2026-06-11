@@ -472,39 +472,40 @@ window.addEventListener('load', () => {
 // ===== FORMULARIO DE CONTACTO =====
 const form = document.getElementById('contactFormPage');
 const feedback = document.getElementById('formFeedbackPage');
+if (form) {
+    form.addEventListener('submit', async function(e) {
 
-form.addEventListener('submit', async function(e) {
+        e.preventDefault();
 
-    e.preventDefault();
+        feedback.innerHTML = 'Enviando...';
 
-    feedback.innerHTML = 'Enviando...';
+        const formData = new FormData(form);
 
-    const formData = new FormData(form);
-
-    try {
-        const response = await fetch(
-            'https://script.google.com/macros/s/AKfycbx-pjspZTR7f9mUdmrjkLekXn7BMVu-uV5dg3OMBCbXDcCQapx3D1gqL9XJypYpxApL6A/exec',
-            {
-                method: 'POST',
-                body: formData
+        try {
+            const response = await fetch(
+                'https://script.google.com/macros/s/AKfycbx-pjspZTR7f9mUdmrjkLekXn7BMVu-uV5dg3OMBCbXDcCQapx3D1gqL9XJypYpxApL6A/exec',
+                {
+                    method: 'POST',
+                    body: formData
+                }
+            );
+            const result = await response.json();
+            if (result.success) {
+                feedback.innerHTML =
+                    '✅ ¡Mensaje enviado! Te contactaremos pronto.';
+                form.reset();
+            } else {
+                feedback.innerHTML =
+                    result.error || '❌ Error al enviar. Intenta de nuevo.';
             }
-        );
-        const result = await response.json();
-        if (result.success) {
+        } catch (error) {
+            console.error(error);
             feedback.innerHTML =
-                '✅ ¡Mensaje enviado! Te contactaremos pronto.';
-            form.reset();
-        } else {
-            feedback.innerHTML =
-                result.error || '❌ Error al enviar. Intenta de nuevo.';
+                '❌ Error de conexión. Verifica tu internet.';
         }
-    } catch (error) {
-        console.error(error);
-        feedback.innerHTML =
-            '❌ Error de conexión. Verifica tu internet.';
-    }
 
-});
+    });
+}
 
 // ===== MENÚ HAMBURGUESA =====
 const hamburger = document.getElementById('hamburger');
