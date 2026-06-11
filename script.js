@@ -470,41 +470,41 @@ window.addEventListener('load', () => {
 });
 
 // ===== FORMULARIO DE CONTACTO =====
-const contactForm = document.getElementById('contactFormPage');
-if (contactForm) {
-    contactForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = new FormData(contactForm);
-        const feedback = document.getElementById('formFeedbackPage');
-        
-        const submitBtn = contactForm.querySelector('button[type="submit"]');
-        const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = 'Enviando...';
-        submitBtn.disabled = true;
-        
-        try {
-            const response = await fetch(contactForm.action, {
+const form = document.getElementById('contactFormPage');
+const feedback = document.getElementById('formFeedbackPage');
+
+form.addEventListener('submit', async function(e) {
+
+    e.preventDefault();
+
+    feedback.innerHTML = 'Enviando...';
+
+    const formData = new FormData(form);
+
+    try {
+        const response = await fetch(
+            'https://script.google.com/macros/s/AKfycbx-pjspZTR7f9mUdmrjkLekXn7BMVu-uV5dg3OMBCbXDcCQapx3D1gqL9XJypYpxApL6A/exec',
+            {
                 method: 'POST',
-                body: formData,
-                headers: { 'Accept': 'application/json' }
-            });
-            
-            if (response.ok) {
-                feedback.innerHTML = '<span style="color:#1565C0;">✅ ¡Mensaje enviado! Te contactaremos pronto.</span>';
-                contactForm.reset();
-                setTimeout(() => feedback.innerHTML = '', 5000);
-            } else {
-                feedback.innerHTML = '<span style="color:#C62828;">❌ Error al enviar. Intenta de nuevo.</span>';
+                body: formData
             }
-        } catch (error) {
-            feedback.innerHTML = '<span style="color:#C62828;">❌ Error de conexión. Verifica tu internet.</span>';
+        );
+        const result = await response.json();
+        if (result.success) {
+            feedback.innerHTML =
+                '✅ ¡Mensaje enviado! Te contactaremos pronto.';
+            form.reset();
+        } else {
+            feedback.innerHTML =
+                result.error || '❌ Error al enviar. Intenta de nuevo.';
         }
-        
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-        setTimeout(() => feedback.innerHTML = '', 5000);
-    });
-}
+    } catch (error) {
+        console.error(error);
+        feedback.innerHTML =
+            '❌ Error de conexión. Verifica tu internet.';
+    }
+
+});
 
 // ===== MENÚ HAMBURGUESA =====
 const hamburger = document.getElementById('hamburger');

@@ -64,31 +64,44 @@
     </div>
   </div>
 
-  <form id="contactFormPage" action="https://formspree.io/f/meevabkk" method="POST">
-        <div class="form-group">
-            <input type="text" name="nombre" id="fullName" placeholder="Nombre completo *" required>
-        </div>
-        <div class="form-group">
-            <input type="email" name="email" id="emailPage" placeholder="Correo electrónico *" required>
-        </div>
-        <div class="form-group">
-            <input type="tel" name="telefono" id="phone" placeholder="Teléfono">
-        </div>
-        
-        <!-- Campo de producto - ahora es de solo lectura (se llena automáticamente) -->
-        <div class="form-group">
-            <input type="text" name="producto" id="productInterest" 
-                placeholder="Producto de interés" >
-        </div>
-        
-        <div class="form-group">
-            <textarea rows="5" name="mensaje" id="messagePage" placeholder="Cuéntanos sobre tu proyecto..."></textarea>
-        </div>
-        
-        <input type="hidden" name="_next" value="https://tusitio.com/gracias.html">
-        <button type="submit" class="btn-send">Enviar mensaje</button>
-        <div id="formFeedbackPage" class="alert-msg"></div>
-    </form>
+<form id="contactFormPage">
+    <div class="form-group">
+        <input type="text" name="nombre" id="fullName" placeholder="Nombre completo *" required>
+    </div>
+
+    <div class="form-group">
+        <input type="email" name="email" id="emailPage" placeholder="Correo electrónico *" required>
+    </div>
+
+    <div class="form-group">
+        <input type="tel" name="telefono" id="phone" placeholder="Teléfono">
+    </div>
+
+    <div class="form-group">
+        <input type="text" name="producto" id="productInterest"
+            placeholder="Producto de interés">
+    </div>
+
+    <div class="form-group">
+        <textarea rows="5" name="mensaje" id="messagePage"
+            placeholder="Cuéntanos sobre tu proyecto..."></textarea>
+    </div>
+    
+    <input
+        type="text"
+        name="website"
+        id="website"
+        style="display:none"
+        tabindex="-1"
+        autocomplete="off"
+    >
+
+    <button type="submit" class="btn-send">
+        Enviar mensaje
+    </button>
+
+    <div id="formFeedbackPage" class="alert-msg"></div>
+</form>
 
 
 </main>
